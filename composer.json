@@ -1,0 +1,22 @@
+{
+    "name": "clue/promise-timeout",
+    "description": "Trivial timeout implementation for Promises",
+    "keywords": ["Promise", "timeout", "event-loop", "ReactPHP", "async"],
+    "homepage": "https://github.com/clue/php-promise-timeout",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Christian Lück",
+            "email": "christian@lueck.tv"
+        }
+    ],
+    "autoload": {
+        "psr-4": { "Clue\\Promise\\Timeout\\": "src/" },
+        "files": [ "src/functions.php" ]
+    },
+    "require": {
+        "php": ">=5.3",
+        "react/event-loop": "~0.4.0|~0.3.0",
+        "react/promise": "~2.0|~1.0"
+    }
+}
