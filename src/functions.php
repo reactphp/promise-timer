@@ -7,7 +7,7 @@ use React\EventLoop\LoopInterface;
 use React\Promise\PromiseInterface;
 use React\Promise\Promise;
 
-function await(PromiseInterface $promise, $time, LoopInterface $loop)
+function timeout(PromiseInterface $promise, $time, LoopInterface $loop)
 {
     return new Promise(function ($resolve, $reject) use ($loop, $time, $promise) {
         $timer = $loop->addTimer($time, function () use ($time, $promise, $reject) {
