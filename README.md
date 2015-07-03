@@ -176,6 +176,23 @@ Timer\resolve(1.5, $loop)->then(function ($time) {
 });
 ```
 
+#### Resolve cancellation
+
+You can explicitly `cancel()` the resulting timer promise at any time:
+
+```php
+$timer = Timer\resolve(2.0, $loop);
+
+$timer->cancel();
+```
+
+This will abort the timer and *reject* with a `RuntimeException`.
+
+> Note: If you're stuck on legacy versions (PHP 5.3), then the `cancel()` method
+is not available, as the Promise cancellation API is currently only available in
+[react/promise v2.1.0](https://github.com/reactphp/promise)
+which in turn requires PHP 5.4 or up.
+
 ### reject()
 
 The `reject($time, LoopInterface $loop)` function can be used to create a new Promise
@@ -183,12 +200,29 @@ which rejects in `$time` seconds with a `TimeoutException`.
 
 ```php
 Timer\reject(2.0, $loop)->then(null, function (TimeoutException $e) {
-    echo '
+    echo 'Rejected after ' . $e->getTimeout() . ' seconds ' . PHP_EOL;
 });
 ```
 
 This function complements the [`resolve()`](#resolve) function
 and can be used as a basic building block for higher-level promise consumers.
+
+#### Reject cancellation
+
+You can explicitly `cancel()` the resulting timer promise at any time:
+
+```php
+$timer = Timer\reject(2.0, $loop);
+
+$timer->cancel();
+```
+
+This will abort the timer and *reject* with a `RuntimeException`.
+
+> Note: If you're stuck on legacy versions (PHP 5.3), then the `cancel()` method
+is not available, as the Promise cancellation API is currently only available in
+[react/promise v2.1.0](https://github.com/reactphp/promise)
+which in turn requires PHP 5.4 or up.
 
 ### TimeoutException
 

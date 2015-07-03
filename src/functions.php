@@ -30,10 +30,15 @@ function timeout(PromiseInterface $promise, $time, LoopInterface $loop)
 
 function resolve($time, LoopInterface $loop)
 {
-    return new Promise(function ($resolve) use ($loop, $time) {
-        $loop->addTimer($time, function () use ($time, $resolve) {
+    return new Promise(function ($resolve) use ($loop, $time, &$timer) {
+        // resolve the promise when the timer fires in $time seconds
+        $timer = $loop->addTimer($time, function () use ($time, $resolve) {
             $resolve($time);
         });
+    }, function ($resolveUnused, $reject) use (&$timer, $loop) {
+        // cancelling this promise will cancel the timer and reject
+        $loop->cancelTimer($timer);
+        $reject(new \RuntimeException('Timer cancelled'));
     });
 }
 
