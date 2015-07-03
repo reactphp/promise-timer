@@ -1,15 +1,15 @@
 <?php
 
-use Clue\Promise\Timeout;
+use Clue\Promise\Timer;
 use React\Promise;
 
-class FunctionTimeoutTest extends TestCase
+class FunctionTimerTest extends TestCase
 {
     public function testResolvedWillResolveRightAway()
     {
         $promise = Promise\resolve();
 
-        $promise = Timeout\timeout($promise, 3, $this->loop);
+        $promise = Timer\timeout($promise, 3, $this->loop);
 
         $this->expectPromiseResolved($promise);
     }
@@ -18,7 +18,7 @@ class FunctionTimeoutTest extends TestCase
     {
         $promise = Promise\resolve();
 
-        Timeout\timeout($promise, 3, $this->loop);
+        Timer\timeout($promise, 3, $this->loop);
 
         $time = microtime(true);
         $this->loop->run();
@@ -31,7 +31,7 @@ class FunctionTimeoutTest extends TestCase
     {
         $promise = Promise\reject();
 
-        $promise = Timeout\timeout($promise, 3, $this->loop);
+        $promise = Timer\timeout($promise, 3, $this->loop);
 
         $this->expectPromiseRejected($promise);
     }
@@ -40,7 +40,7 @@ class FunctionTimeoutTest extends TestCase
     {
         $promise = Promise\reject();
 
-        Timeout\timeout($promise, 3, $this->loop);
+        Timer\timeout($promise, 3, $this->loop);
 
         $time = microtime(true);
         $this->loop->run();
@@ -53,7 +53,7 @@ class FunctionTimeoutTest extends TestCase
     {
         $promise = $this->getMock('React\Promise\PromiseInterface');
 
-        $promise = Timeout\timeout($promise, 0.01, $this->loop);
+        $promise = Timer\timeout($promise, 0.01, $this->loop);
 
         $this->loop->run();
 
@@ -70,7 +70,7 @@ class FunctionTimeoutTest extends TestCase
         $promise->expects($this->once())->method('cancel');
 
 
-        Timeout\timeout($promise, 0.01, $this->loop);
+        Timer\timeout($promise, 0.01, $this->loop);
 
         $this->loop->run();
     }

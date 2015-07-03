@@ -1,19 +1,19 @@
 <?php
 
-use Clue\Promise\Timeout;
+use Clue\Promise\Timer;
 
 class FunctionResolveTest extends TestCase
 {
     public function testPromiseIsPendingWithoutRunningLoop()
     {
-        $promise = Timeout\resolve(0.01, $this->loop);
+        $promise = Timer\resolve(0.01, $this->loop);
 
         $this->expectPromisePending($promise);
     }
 
     public function testPromiseWillBeResolvedOnTimeout()
     {
-        $promise = Timeout\resolve(0.01, $this->loop);
+        $promise = Timer\resolve(0.01, $this->loop);
 
         $this->loop->run();
 
