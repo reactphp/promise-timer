@@ -75,6 +75,40 @@ class FunctionTimerTest extends TestCase
         $this->loop->run();
     }
 
+    public function testCancelTimeoutWillCancelTimerAndReject()
+    {
+        if (!interface_exists('React\Promise\CancellablePromiseInterface', true)) {
+            $this->markTestSkipped('Your (outdated?) Promise API does not support cancellable promises');
+        }
+
+        $promise = new \React\Promise\Promise(function () { });
+
+        $loop = $this->getMock('React\EventLoop\LoopInterface');
+
+        $timer = $this->getMock('React\EventLoop\Timer\TimerInterface');
+        $loop->expects($this->once())->method('addTimer')->will($this->returnValue($timer));
+        $loop->expects($this->once())->method('cancelTimer')->with($this->equalTo($timer));
+
+        $timeout = Timer\timeout($promise, 0.01, $loop);
+
+        $timeout->cancel();
+
+        $this->expectPromiseRejected($timeout);
+    }
+
+    public function testCancelTimeoutWillCancelGivenPromise()
+    {
+        if (!interface_exists('React\Promise\CancellablePromiseInterface', true)) {
+            $this->markTestSkipped('Your (outdated?) Promise API does not support cancellable promises');
+        }
+
+        $promise = new \React\Promise\Promise(function () { }, $this->expectCallableOnce());
+
+        $timeout = Timer\timeout($promise, 0.01, $this->loop);
+
+        $timeout->cancel();
+    }
+
     public function testCancelGivenPromiseWillReject()
     {
         if (!interface_exists('React\Promise\CancellablePromiseInterface', true)) {
