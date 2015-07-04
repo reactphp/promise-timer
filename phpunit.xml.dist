@@ -7,7 +7,7 @@
          convertWarningsToExceptions="true"
 >
     <testsuites>
-        <testsuite name="Promise Timeout Test Suite">
+        <testsuite name="Promise Timer Test Suite">
             <directory>./tests/</directory>
         </testsuite>
     </testsuites>

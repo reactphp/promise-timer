@@ -1,6 +1,6 @@
 <?php
 
-use Clue\Promise\Timeout\TimeoutException;
+use Clue\Promise\Timer\TimeoutException;
 
 class TimeoutExceptionTest extends TestCase
 {

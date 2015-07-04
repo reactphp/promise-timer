@@ -1,4 +1,4 @@
-# clue/promise-timeout [![Build Status](https://travis-ci.org/clue/php-promise-timeout.svg?branch=master)](https://travis-ci.org/clue/php-promise-timeout)
+# clue/promise-timer [![Build Status](https://travis-ci.org/clue/php-promise-timer.svg?branch=master)](https://travis-ci.org/clue/php-promise-timer)
 
 A trivial implementation of timeouts for `Promise`s, built on top of [React PHP](http://reactphp.org/).
 
@@ -11,7 +11,7 @@ The recommended way to install this library is [through composer](http://getcomp
 ```JSON
 {
     "require": {
-        "clue/promise-timeout": "dev-master"
+        "clue/promise-timer": "dev-master"
     }
 }
 ```
