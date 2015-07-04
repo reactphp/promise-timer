@@ -142,6 +142,37 @@ is likely one of your smaller problems.
 For more details on the promise cancellation, please refer to the
 [Promise documentation](https://github.com/reactphp/promise#cancellablepromiseinterface).
 
+#### Input cancellation
+
+Irrespective of the timout handling, you can also explicitly `cancel()` the
+input `$promise` at any time.
+This means that the `timeout()` handling does not affect cancellation of the
+input `$promise`, as demonstrated in the following example:
+
+```php
+$promise = accessSomeRemoteResource();
+$timeout = Timer\timeout($promise, 10.0, $loop);
+
+$promise->cancel();
+```
+
+The registered [cancellation handler](#cancellation-handler) is responsible for
+handling the `cancel()` call:
+
+* A described above, a common use involves resource cleanup and will then *reject*
+  the `Promise`.
+  If the input `$promise` is being rejected, then the timeout will be aborted
+  and the resulting promise will also be rejected.
+* If the input `$promise` is still pending, then the timout will continue
+  running until the timer expires.
+  The same happens if the input `$promise` does not register a
+  [cancellation handler](#cancellation-handler). 
+
+> Note: If you're stuck on legacy versions (PHP 5.3), then the `cancel()` method
+is not available, as the Promise cancellation API is currently only available in
+[react/promise v2.1.0](https://github.com/reactphp/promise)
+which in turn requires PHP 5.4 or up.
+
 #### Collections
 
 If you want to wait for multiple promises to resolve, you can use the normal promise primitives like this:
