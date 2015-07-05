@@ -57,9 +57,24 @@ Timer\timeout($promise, 10.0, $loop)->then(
         } else {
             // the input operation has failed due to some other error
         }
-        throw $error;
     }
 );
+```
+
+Or if you're using [react/promise v2.2.0](https://github.com/reactphp/promise) or up:
+
+```php
+Timer\timeout($promise, 10.0, $loop)
+    ->then(function ($value) {
+        // the operation finished within 10.0 seconds
+    })
+    ->otherwise(function (Timer\TimeoutException $error) {
+        // the operation has failed due to a timeout
+    })
+    ->otherwise(function ($error) {
+        // the input operation has failed due to some other error
+    })
+;
 ```
 
 #### Timeout cancellation
