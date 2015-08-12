@@ -1,6 +1,6 @@
 <?php
 
-use Clue\Promise\Timer;
+use React\Promise\Timer;
 use React\Promise;
 
 class FunctionTimerTest extends TestCase

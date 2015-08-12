@@ -1,6 +1,6 @@
 <?php
 
-namespace Clue\Promise\Timer;
+namespace React\Promise\Timer;
 
 use React\Promise\CancellablePromiseInterface;
 use React\EventLoop\LoopInterface;

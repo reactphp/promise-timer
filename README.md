@@ -1,4 +1,4 @@
-# clue/promise-timer [![Build Status](https://travis-ci.org/clue/php-promise-timer.svg?branch=master)](https://travis-ci.org/clue/php-promise-timer)
+# react/promise-timer [![Build Status](https://travis-ci.org/react/promise-timer.svg?branch=master)](https://travis-ci.org/react/promise-timer)
 
 A trivial implementation of timeouts for `Promise`s, built on top of [React PHP](http://reactphp.org/).
 
@@ -7,12 +7,12 @@ A trivial implementation of timeouts for `Promise`s, built on top of [React PHP]
 ## Usage
 
 This lightweight library consists only of a few simple functions.
-All functions reside under the `Clue\Promise\Timer` namespace.
+All functions reside under the `React\Promise\Timer` namespace.
 
 The below examples assume you use an import statement similar to this:
 
 ```php
-use Clue\Promise\Timer;
+use React\Promise\Timer;
 
 Timer\timeout(…);
 ```
@@ -20,7 +20,7 @@ Timer\timeout(…);
 Alternatively, you can also refer to them with their fully-qualified name:
 
 ```php
-\Clue\Promise\Timer\timeout(…);
+\React\Promise\Timer\timeout(…);
 ``` 
 
 ### timeout()
@@ -205,7 +205,7 @@ The recommended way to install this library is [through composer](http://getcomp
 ```JSON
 {
     "require": {
-        "clue/promise-timer": "dev-master"
+        "react/promise-timer": "dev-master"
     }
 }
 ```

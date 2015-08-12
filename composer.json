@@ -1,8 +1,8 @@
 {
-    "name": "clue/promise-timer",
+    "name": "react/promise-timer",
     "description": "Trivial timeout implementation for Promises",
     "keywords": ["Promise", "timeout", "timer", "event-loop", "ReactPHP", "async"],
-    "homepage": "https://github.com/clue/php-promise-timer",
+    "homepage": "https://github.com/react/promise-timer",
     "license": "MIT",
     "authors": [
         {
@@ -11,7 +11,7 @@
         }
     ],
     "autoload": {
-        "psr-4": { "Clue\\Promise\\Timer\\": "src/" },
+        "psr-4": { "React\\Promise\\Timer\\": "src/" },
         "files": [ "src/functions.php" ]
     },
     "require": {
