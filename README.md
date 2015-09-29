@@ -2,8 +2,6 @@
 
 A trivial implementation of timeouts for `Promise`s, built on top of [React PHP](http://reactphp.org/).
 
-> Note: This project is in early alpha stage! Feel free to report any issues you encounter.
-
 ## Usage
 
 This lightweight library consists only of a few simple functions.
@@ -200,12 +198,13 @@ The `getTimeout()` method can be used to get the timeout value in seconds.
 
 ## Install
 
-The recommended way to install this library is [through composer](http://getcomposer.org). [New to composer?](http://getcomposer.org/doc/00-intro.md)
+The recommended way to install this library is [through composer](http://getcomposer.org).
+[New to composer?](http://getcomposer.org/doc/00-intro.md)
 
 ```JSON
 {
     "require": {
-        "react/promise-timer": "dev-master"
+        "react/promise-timer": "~1.0"
     }
 }
 ```
