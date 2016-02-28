@@ -38,10 +38,6 @@ class FunctionResolveTest extends TestCase
 
         $promise = Timer\resolve(0.01, $loop);
 
-        if (!($promise instanceof CancellablePromiseInterface)) {
-            $this->markTestSkipped('Outdated Promise API');
-        }
-
         $loop->expects($this->once())->method('cancelTimer')->with($this->equalTo($timer));
 
         $promise->cancel();
@@ -50,10 +46,6 @@ class FunctionResolveTest extends TestCase
     public function testCancelingPromiseWillRejectTimer()
     {
         $promise = Timer\resolve(0.01, $this->loop);
-
-        if (!($promise instanceof CancellablePromiseInterface)) {
-            $this->markTestSkipped('Outdated Promise API');
-        }
 
         $promise->cancel();
 

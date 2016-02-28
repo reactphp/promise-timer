@@ -25,10 +25,6 @@ class FunctionRejectTest extends TestCase
     {
         $promise = Timer\reject(0.01, $this->loop);
 
-        if (!($promise instanceof CancellablePromiseInterface)) {
-            $this->markTestSkipped('Outdated Promise API');
-        }
-
         $promise->cancel();
 
         $this->expectPromiseRejected($promise);

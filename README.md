@@ -132,13 +132,6 @@ If no cancellation handler is passed to the `Promise` constructor, then invoking
 its `cancel()` method it is effectively a NO-OP.
 This means that it may still be pending and can hence continue consuming resources.
 
-> Note: If you're stuck on legacy versions (PHP 5.3), then this is also a NO-OP,
-as the Promise cancellation API is currently only available in
-[react/promise v2.1.0](https://github.com/reactphp/promise)
-which in turn requires PHP 5.4 or up.
-It is assumed that if you're actually still stuck on PHP 5.3, resource cleanup
-is likely one of your smaller problems. 
-
 For more details on the promise cancellation, please refer to the
 [Promise documentation](https://github.com/reactphp/promise#cancellablepromiseinterface).
 
@@ -167,11 +160,6 @@ handling the `cancel()` call:
   running until the timer expires.
   The same happens if the input `$promise` does not register a
   [cancellation handler](#cancellation-handler). 
-
-> Note: If you're stuck on legacy versions (PHP 5.3), then the `cancel()` method
-is not available, as the Promise cancellation API is currently only available in
-[react/promise v2.1.0](https://github.com/reactphp/promise)
-which in turn requires PHP 5.4 or up.
 
 #### Output cancellation
 
@@ -229,11 +217,6 @@ This means that while the resulting promise will still be rejected after the
 timeout, the underlying input `$promise` may still be pending and can hence
 continue consuming resources.
 
-> Note: If you're stuck on legacy versions (PHP 5.3), then the `cancel()` method
-is not available, as the Promise cancellation API is currently only available in
-[react/promise v2.1.0](https://github.com/reactphp/promise)
-which in turn requires PHP 5.4 or up.
-
 #### Collections
 
 If you want to wait for multiple promises to resolve, you can use the normal promise primitives like this:
@@ -280,11 +263,6 @@ $timer->cancel();
 
 This will abort the timer and *reject* with a `RuntimeException`.
 
-> Note: If you're stuck on legacy versions (PHP 5.3), then the `cancel()` method
-is not available, as the Promise cancellation API is currently only available in
-[react/promise v2.1.0](https://github.com/reactphp/promise)
-which in turn requires PHP 5.4 or up.
-
 ### reject()
 
 The `reject($time, LoopInterface $loop)` function can be used to create a new Promise
@@ -311,11 +289,6 @@ $timer->cancel();
 
 This will abort the timer and *reject* with a `RuntimeException`.
 
-> Note: If you're stuck on legacy versions (PHP 5.3), then the `cancel()` method
-is not available, as the Promise cancellation API is currently only available in
-[react/promise v2.1.0](https://github.com/reactphp/promise)
-which in turn requires PHP 5.4 or up.
-
 ### TimeoutException
 
 The `TimeoutException` extends PHP's built-in `RuntimeException`.
@@ -334,12 +307,6 @@ The recommended way to install this library is [through composer](http://getcomp
     }
 }
 ```
-
-> Note: If you're stuck on legacy versions (PHP 5.3), then the `cancel()` method
-is not available,
-as the Promise cancellation API is currently only available in
-[react/promise v2.1.0](https://github.com/reactphp/promise)
-which in turn requires PHP 5.4 or up.
 
 ## License
 

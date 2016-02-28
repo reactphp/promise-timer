@@ -62,10 +62,6 @@ class FunctionTimerTest extends TestCase
 
     public function testPendingCancellableWillBeCancelledOnTimeout()
     {
-        if (!interface_exists('React\Promise\CancellablePromiseInterface', true)) {
-            $this->markTestSkipped('Your (outdated?) Promise API does not support cancellable promises');
-        }
-
         $promise = $this->getMock('React\Promise\CancellablePromiseInterface');
         $promise->expects($this->once())->method('cancel');
 
@@ -76,10 +72,6 @@ class FunctionTimerTest extends TestCase
 
     public function testCancelTimeoutWithoutCancellationhandlerWillNotCancelTimerAndWillNotReject()
     {
-        if (!interface_exists('React\Promise\CancellablePromiseInterface', true)) {
-            $this->markTestSkipped('Your (outdated?) Promise API does not support cancellable promises');
-        }
-
         $promise = new \React\Promise\Promise(function () { });
 
         $loop = $this->getMock('React\EventLoop\LoopInterface');
@@ -97,10 +89,6 @@ class FunctionTimerTest extends TestCase
 
     public function testCancelTimeoutWillCancelGivenPromise()
     {
-        if (!interface_exists('React\Promise\CancellablePromiseInterface', true)) {
-            $this->markTestSkipped('Your (outdated?) Promise API does not support cancellable promises');
-        }
-
         $promise = new \React\Promise\Promise(function () { }, $this->expectCallableOnce());
 
         $timeout = Timer\timeout($promise, 0.01, $this->loop);
@@ -110,10 +98,6 @@ class FunctionTimerTest extends TestCase
 
     public function testCancelGivenPromiseWillReject()
     {
-        if (!interface_exists('React\Promise\CancellablePromiseInterface', true)) {
-            $this->markTestSkipped('Your (outdated?) Promise API does not support cancellable promises');
-        }
-
         $promise = new \React\Promise\Promise(function () { }, function ($resolve, $reject) { $reject(); });
 
         $timeout = Timer\timeout($promise, 0.01, $this->loop);
@@ -126,10 +110,6 @@ class FunctionTimerTest extends TestCase
 
     public function testCancelTimeoutWillRejectIfGivenPromiseWillReject()
     {
-        if (!interface_exists('React\Promise\CancellablePromiseInterface', true)) {
-            $this->markTestSkipped('Your (outdated?) Promise API does not support cancellable promises');
-        }
-
         $promise = new \React\Promise\Promise(function () { }, function ($resolve, $reject) { $reject(); });
 
         $timeout = Timer\timeout($promise, 0.01, $this->loop);
@@ -142,10 +122,6 @@ class FunctionTimerTest extends TestCase
 
     public function testCancelTimeoutWillResolveIfGivenPromiseWillResolve()
     {
-        if (!interface_exists('React\Promise\CancellablePromiseInterface', true)) {
-            $this->markTestSkipped('Your (outdated?) Promise API does not support cancellable promises');
-        }
-
         $promise = new \React\Promise\Promise(function () { }, function ($resolve, $reject) { $resolve(); });
 
         $timeout = Timer\timeout($promise, 0.01, $this->loop);
