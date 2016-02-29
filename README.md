@@ -132,15 +132,90 @@ If no cancellation handler is passed to the `Promise` constructor, then invoking
 its `cancel()` method it is effectively a NO-OP.
 This means that it may still be pending and can hence continue consuming resources.
 
-> Note: If you're stuck on legacy versions (PHP 5.3), then this is also a NO-OP,
-as the Promise cancellation API is currently only available in
-[react/promise v2.1.0](https://github.com/reactphp/promise)
-which in turn requires PHP 5.4 or up.
-It is assumed that if you're actually still stuck on PHP 5.3, resource cleanup
-is likely one of your smaller problems. 
-
 For more details on the promise cancellation, please refer to the
 [Promise documentation](https://github.com/reactphp/promise#cancellablepromiseinterface).
+
+#### Input cancellation
+
+Irrespective of the timout handling, you can also explicitly `cancel()` the
+input `$promise` at any time.
+This means that the `timeout()` handling does not affect cancellation of the
+input `$promise`, as demonstrated in the following example:
+
+```php
+$promise = accessSomeRemoteResource();
+$timeout = Timer\timeout($promise, 10.0, $loop);
+
+$promise->cancel();
+```
+
+The registered [cancellation handler](#cancellation-handler) is responsible for
+handling the `cancel()` call:
+
+* A described above, a common use involves resource cleanup and will then *reject*
+  the `Promise`.
+  If the input `$promise` is being rejected, then the timeout will be aborted
+  and the resulting promise will also be rejected.
+* If the input `$promise` is still pending, then the timout will continue
+  running until the timer expires.
+  The same happens if the input `$promise` does not register a
+  [cancellation handler](#cancellation-handler). 
+
+#### Output cancellation
+
+Similarily, you can also explicitly `cancel()` the resulting promise like this:
+
+```php
+$promise = accessSomeRemoteResource();
+$timeout = Timer\timeout($promise, 10.0, $loop);
+
+$timeout->cancel();
+```
+
+Note how this looks very similar to the above [input cancellation](#input-cancellation)
+example. Accordingly, it also behaves very similar.
+
+Calling `cancel()` on the resulting promise will merely try
+to `cancel()` the input `$promise`.
+This means that we do not take over responsibility of the outcome and it's
+entirely up to the input `$promise` to handle cancellation support.
+
+The registered [cancellation handler](#cancellation-handler) is responsible for
+handling the `cancel()` call:
+
+* As described above, a common use involves resource cleanup and will then *reject*
+  the `Promise`.
+  If the input `$promise` is being rejected, then the timeout will be aborted
+  and the resulting promise will also be rejected.
+* If the input `$promise` is still pending, then the timout will continue
+  running until the timer expires.
+  The same happens if the input `$promise` does not register a
+  [cancellation handler](#cancellation-handler). 
+
+To re-iterate, note that calling `cancel()` on the resulting promise will merely
+try to cancel the input `$promise` only.
+It is then up to the cancellation handler of the input promise to settle the promise.
+If the input promise is still pending when the timeout occurs, then the normal
+[timeout cancellation](#timeout-cancellation) handling will trigger, effectively rejecting
+the output promise with a [`TimeoutException`](#timeoutexception).
+
+This is done for consistency with the [timeout cancellation](#timeout-cancellation)
+handling and also because it is assumed this is often used like this:
+
+```php
+$timeout = Timer\timeout(accessSomeRemoteResource(), 10.0, $loop);
+
+$timeout->cancel();
+```
+
+As described above, this example works as expected and cleans up any resources
+allocated for the input `$promise`.
+
+Note that if the given input `$promise` does not support cancellation, then this
+is a NO-OP.
+This means that while the resulting promise will still be rejected after the
+timeout, the underlying input `$promise` may still be pending and can hence
+continue consuming resources.
 
 #### Collections
 
@@ -176,6 +251,18 @@ Timer\resolve(1.5, $loop)->then(function ($time) {
 });
 ```
 
+#### Resolve cancellation
+
+You can explicitly `cancel()` the resulting timer promise at any time:
+
+```php
+$timer = Timer\resolve(2.0, $loop);
+
+$timer->cancel();
+```
+
+This will abort the timer and *reject* with a `RuntimeException`.
+
 ### reject()
 
 The `reject($time, LoopInterface $loop)` function can be used to create a new Promise
@@ -183,12 +270,24 @@ which rejects in `$time` seconds with a `TimeoutException`.
 
 ```php
 Timer\reject(2.0, $loop)->then(null, function (TimeoutException $e) {
-    echo '
+    echo 'Rejected after ' . $e->getTimeout() . ' seconds ' . PHP_EOL;
 });
 ```
 
 This function complements the [`resolve()`](#resolve) function
 and can be used as a basic building block for higher-level promise consumers.
+
+#### Reject cancellation
+
+You can explicitly `cancel()` the resulting timer promise at any time:
+
+```php
+$timer = Timer\reject(2.0, $loop);
+
+$timer->cancel();
+```
+
+This will abort the timer and *reject* with a `RuntimeException`.
 
 ### TimeoutException
 
@@ -208,12 +307,6 @@ The recommended way to install this library is [through composer](http://getcomp
     }
 }
 ```
-
-> Note: If you're stuck on legacy versions (PHP 5.3), then the `cancel()` method
-is not available,
-as the Promise cancellation API is currently only available in
-[react/promise v2.1.0](https://github.com/reactphp/promise)
-which in turn requires PHP 5.4 or up.
 
 ## License
 

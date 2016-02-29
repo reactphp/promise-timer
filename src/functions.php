@@ -9,6 +9,13 @@ use React\Promise\Promise;
 
 function timeout(PromiseInterface $promise, $time, LoopInterface $loop)
 {
+    // cancelling this promise will only try to cancel the input promise,
+    // thus leaving responsibility to the input promise.
+    $canceller = null;
+    if ($promise instanceof CancellablePromiseInterface) {
+        $canceller = array($promise, 'cancel');
+    }
+
     return new Promise(function ($resolve, $reject) use ($loop, $time, $promise) {
         $timer = $loop->addTimer($time, function () use ($time, $promise, $reject) {
             $reject(new TimeoutException($time, 'Timed out after ' . $time . ' seconds'));
@@ -25,15 +32,20 @@ function timeout(PromiseInterface $promise, $time, LoopInterface $loop)
             $loop->cancelTimer($timer);
             $reject($v);
         });
-    });
+    }, $canceller);
 }
 
 function resolve($time, LoopInterface $loop)
 {
-    return new Promise(function ($resolve) use ($loop, $time) {
-        $loop->addTimer($time, function () use ($time, $resolve) {
+    return new Promise(function ($resolve) use ($loop, $time, &$timer) {
+        // resolve the promise when the timer fires in $time seconds
+        $timer = $loop->addTimer($time, function () use ($time, $resolve) {
             $resolve($time);
         });
+    }, function ($resolveUnused, $reject) use (&$timer, $loop) {
+        // cancelling this promise will cancel the timer and reject
+        $loop->cancelTimer($timer);
+        $reject(new \RuntimeException('Timer cancelled'));
     });
 }
 
