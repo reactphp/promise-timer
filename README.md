@@ -297,16 +297,16 @@ The `getTimeout()` method can be used to get the timeout value in seconds.
 
 ## Install
 
-The recommended way to install this library is [through composer](http://getcomposer.org).
-[New to composer?](http://getcomposer.org/doc/00-intro.md)
+The recommended way to install this library is [through Composer](http://getcomposer.org).
+[New to Composer?](http://getcomposer.org/doc/00-intro.md)
 
-```JSON
-{
-    "require": {
-        "react/promise-timer": "~1.0"
-    }
-}
+This will install the latest supported version:
+
+```bash
+$ composer require react/promise-timer:~1.0
 ```
+
+More details and upgrade guides can be found in the [CHANGELOG](CHANGELOG.md).
 
 ## License
 
