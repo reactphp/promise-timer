@@ -1,5 +1,7 @@
 <?php
 
+namespace React\Tests\Promise\Timer;
+
 use React\Promise\Timer\TimeoutException;
 
 class TimeoutExceptionTest extends TestCase

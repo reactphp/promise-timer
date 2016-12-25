@@ -1,8 +1,9 @@
 <?php
 
-use React\EventLoop\Factory;
+namespace React\Tests\Promise\Timer;
 
-require __DIR__ . '/../vendor/autoload.php';
+use React\EventLoop\Factory;
+use PHPUnit_Framework_TestCase;
 
 class TestCase extends PHPUnit_Framework_TestCase
 {
@@ -40,9 +41,8 @@ class TestCase extends PHPUnit_Framework_TestCase
      */
     protected function createCallableMock()
     {
-        return $this->getMock('CallableStub');
+        return $this->getMock('React\Tests\Promise\Timer\CallableStub');
     }
-
 
     protected function expectPromiseRejected($promise)
     {
@@ -57,12 +57,5 @@ class TestCase extends PHPUnit_Framework_TestCase
     protected function expectPromisePending($promise)
     {
         return $promise->then($this->expectCallableNever(), $this->expectCallableNever());
-    }
-}
-
-class CallableStub
-{
-    public function __invoke()
-    {
     }
 }
