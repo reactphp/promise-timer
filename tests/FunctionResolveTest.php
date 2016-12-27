@@ -1,7 +1,8 @@
 <?php
 
+namespace React\Tests\Promise\Timer;
+
 use React\Promise\Timer;
-use React\Promise\CancellablePromiseInterface;
 
 class FunctionResolveTest extends TestCase
 {
