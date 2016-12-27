@@ -2,6 +2,23 @@
 
 A trivial implementation of timeouts for `Promise`s, built on top of [React PHP](http://reactphp.org/).
 
+**Table of contents**
+
+* [Usage](#usage)
+  * [timeout()](#timeout)
+    * [Timeout cancellation](#timeout-cancellation)
+    * [Cancellation handler](#cancellation-handler)
+    * [Input cancellation](#input-cancellation)
+    * [Output cancellation](#output-cancellation)
+    * [Collections](#collections)
+  * [resolve()](#resolve)
+    * [Resolve cancellation](#resolve-cancellation)
+  * [reject()](#reject)
+    * [Reject cancellation](#reject-cancellation)
+  * [TimeoutException](#timeoutexception)
+* [Install](#install)
+* [License](#license)
+
 ## Usage
 
 This lightweight library consists only of a few simple functions.
