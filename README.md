@@ -320,7 +320,7 @@ The recommended way to install this library is [through Composer](http://getcomp
 This will install the latest supported version:
 
 ```bash
-$ composer require react/promise-timer:~1.0
+$ composer require react/promise-timer:^1.1.1
 ```
 
 More details and upgrade guides can be found in the [CHANGELOG](CHANGELOG.md).
