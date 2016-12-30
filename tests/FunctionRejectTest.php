@@ -13,9 +13,25 @@ class FunctionRejectTest extends TestCase
         $this->expectPromisePending($promise);
     }
 
+    public function testPromiseExpiredIsPendingWithoutRunningLoop()
+    {
+        $promise = Timer\reject(-1, $this->loop);
+
+        $this->expectPromisePending($promise);
+    }
+
     public function testPromiseWillBeRejectedOnTimeout()
     {
         $promise = Timer\reject(0.01, $this->loop);
+
+        $this->loop->run();
+
+        $this->expectPromiseRejected($promise);
+    }
+
+    public function testPromiseExpiredWillBeRejectedOnTimeout()
+    {
+        $promise = Timer\reject(-1, $this->loop);
 
         $this->loop->run();
 
