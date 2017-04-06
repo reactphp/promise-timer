@@ -17,6 +17,7 @@ A trivial implementation of timeouts for `Promise`s, built on top of [React PHP]
     * [Reject cancellation](#reject-cancellation)
   * [TimeoutException](#timeoutexception)
 * [Install](#install)
+* [Tests](#tests)
 * [License](#license)
 
 ## Usage
@@ -324,6 +325,21 @@ $ composer require react/promise-timer:^1.1.1
 ```
 
 More details and upgrade guides can be found in the [CHANGELOG](CHANGELOG.md).
+
+## Tests
+
+To run the test suite, you first need to clone this repo and then install all
+dependencies [through Composer](http://getcomposer.org):
+
+```bash
+$ composer install
+```
+
+To run the test suite, go to the project root and run:
+
+```bash
+$ php vendor/bin/phpunit
+```
 
 ## License
 
