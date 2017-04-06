@@ -13,9 +13,25 @@ class FunctionResolveTest extends TestCase
         $this->expectPromisePending($promise);
     }
 
+    public function testPromiseExpiredIsPendingWithoutRunningLoop()
+    {
+        $promise = Timer\resolve(-1, $this->loop);
+
+        $this->expectPromisePending($promise);
+    }
+
     public function testPromiseWillBeResolvedOnTimeout()
     {
         $promise = Timer\resolve(0.01, $this->loop);
+
+        $this->loop->run();
+
+        $this->expectPromiseResolved($promise);
+    }
+
+    public function testPromiseExpiredWillBeResolvedOnTimeout()
+    {
+        $promise = Timer\resolve(-1, $this->loop);
 
         $this->loop->run();
 

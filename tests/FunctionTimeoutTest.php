@@ -16,6 +16,15 @@ class FunctionTimerTest extends TestCase
         $this->expectPromiseResolved($promise);
     }
 
+    public function testResolvedExpiredWillResolveRightAway()
+    {
+        $promise = Promise\resolve();
+
+        $promise = Timer\timeout($promise, -1, $this->loop);
+
+        $this->expectPromiseResolved($promise);
+    }
+
     public function testResolvedWillNotStartTimer()
     {
         $promise = Promise\resolve();
