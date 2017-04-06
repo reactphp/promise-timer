@@ -41,7 +41,7 @@ class TestCase extends PHPUnit_Framework_TestCase
      */
     protected function createCallableMock()
     {
-        return $this->getMock('React\Tests\Promise\Timer\CallableStub');
+        return $this->getMockBuilder('React\Tests\Promise\Timer\CallableStub')->getMock();
     }
 
     protected function expectPromiseRejected($promise)
