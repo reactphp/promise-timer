@@ -40,7 +40,7 @@ class FunctionResolveTest extends TestCase
 
     public function testWillStartLoopTimer()
     {
-        $loop = $this->getMock('React\EventLoop\LoopInterface');
+        $loop = $this->getMockBuilder('React\EventLoop\LoopInterface')->getMock();
         $loop->expects($this->once())->method('addTimer')->with($this->equalTo(0.01));
 
         Timer\resolve(0.01, $loop);
@@ -48,9 +48,9 @@ class FunctionResolveTest extends TestCase
 
     public function testCancellingPromiseWillCancelLoopTimer()
     {
-        $loop = $this->getMock('React\EventLoop\LoopInterface');
+        $loop = $this->getMockBuilder('React\EventLoop\LoopInterface')->getMock();
 
-        $timer = $this->getMock('React\EventLoop\Timer\TimerInterface');
+        $timer = $this->getMockBuilder('React\EventLoop\Timer\TimerInterface')->getMock();
         $loop->expects($this->once())->method('addTimer')->will($this->returnValue($timer));
 
         $promise = Timer\resolve(0.01, $loop);
