@@ -9,6 +9,14 @@ php:
   - 7.1
   - hhvm
 
+# also test against HHVM, but require "trusty" and ignore errors
+matrix:
+  include:
+    - php: hhvm
+      dist: trusty
+  allow_failures:
+    - php: hhvm
+
 install:
   - composer install --no-interaction
 
