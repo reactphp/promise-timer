@@ -98,6 +98,30 @@ class FunctionTimerTest extends TestCase
         $this->expectPromisePending($timeout);
     }
 
+    public function testResolvedPromiseWillNotStartTimer()
+    {
+        $promise = new \React\Promise\Promise(function ($resolve) { $resolve(true); });
+
+        $loop = $this->getMockBuilder('React\EventLoop\LoopInterface')->getMock();
+        $loop->expects($this->never())->method('addTimer');
+
+        $timeout = Timer\timeout($promise, 0.01, $loop);
+
+        $this->expectPromiseResolved($timeout);
+    }
+
+    public function testRejectedPromiseWillNotStartTimer()
+    {
+        $promise = Promise\reject(new \RuntimeException());
+
+        $loop = $this->getMockBuilder('React\EventLoop\LoopInterface')->getMock();
+        $loop->expects($this->never())->method('addTimer');
+
+        $timeout = Timer\timeout($promise, 0.01, $loop);
+
+        $this->expectPromiseRejected($timeout);
+    }
+
     public function testCancelTimeoutWillCancelGivenPromise()
     {
         $promise = new \React\Promise\Promise(function () { }, $this->expectCallableOnce());

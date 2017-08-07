@@ -50,6 +50,14 @@ It returns a new `Promise` with the following resolution behavior:
 * If the input `$promise` rejects before `$time` seconds, reject the resulting promise with its rejection value.
 * If the input `$promise` does not settle before `$time` seconds, *cancel* the operation and reject the resulting promise with a [`TimeoutException`](#timeoutexception).
 
+Internally, the given `$time` value will be used to start a timer that will
+*cancel* the pending operation once it triggers.
+This implies that if you pass a really small (or negative) value, it will still
+start a timer and will thus trigger at the earliest possible time in the future.
+
+If the input `$promise` is already settled, then the resulting promise will
+resolve or reject immediately without starting a timer at all.
+
 A common use case for handling only resolved values looks like this:
 
 ```php
@@ -269,6 +277,11 @@ Timer\resolve(1.5, $loop)->then(function ($time) {
 });
 ```
 
+Internally, the given `$time` value will be used to start a timer that will
+resolve the promise once it triggers.
+This implies that if you pass a really small (or negative) value, it will still
+start a timer and will thus trigger at the earliest possible time in the future.
+
 #### Resolve cancellation
 
 You can explicitly `cancel()` the resulting timer promise at any time:
@@ -291,6 +304,11 @@ Timer\reject(2.0, $loop)->then(null, function (TimeoutException $e) {
     echo 'Rejected after ' . $e->getTimeout() . ' seconds ' . PHP_EOL;
 });
 ```
+
+Internally, the given `$time` value will be used to start a timer that will
+reject the promise once it triggers.
+This implies that if you pass a really small (or negative) value, it will still
+start a timer and will thus trigger at the earliest possible time in the future.
 
 This function complements the [`resolve()`](#resolve) function
 and can be used as a basic building block for higher-level promise consumers.
