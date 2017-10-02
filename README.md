@@ -1,6 +1,8 @@
-# react/promise-timer [![Build Status](https://travis-ci.org/reactphp/promise-timer.svg?branch=master)](https://travis-ci.org/reactphp/promise-timer)
+# PromiseTimer
 
-A trivial implementation of timeouts for `Promise`s, built on top of [React PHP](http://reactphp.org/).
+[![Build Status](https://travis-ci.org/reactphp/promise-timer.svg?branch=master)](https://travis-ci.org/reactphp/promise-timer)
+
+A trivial implementation of timeouts for `Promise`s, built on top of [ReactPHP](https://reactphp.org/).
 
 **Table of contents**
 
@@ -361,4 +363,4 @@ $ php vendor/bin/phpunit
 
 ## License
 
-MIT
+MIT, see [LICENSE file](LICENSE).
