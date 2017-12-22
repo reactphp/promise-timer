@@ -2,10 +2,10 @@
 
 namespace React\Tests\Promise\Timer;
 
+use PHPUnit\Framework\TestCase as BaseTestCase;
 use React\EventLoop\Factory;
-use PHPUnit_Framework_TestCase;
 
-class TestCase extends PHPUnit_Framework_TestCase
+class TestCase extends BaseTestCase
 {
     protected $loop;
 
