@@ -50,7 +50,7 @@ class FunctionResolveTest extends TestCase
     {
         $loop = $this->getMockBuilder('React\EventLoop\LoopInterface')->getMock();
 
-        $timer = $this->getMockBuilder('React\EventLoop\Timer\TimerInterface')->getMock();
+        $timer = $this->getMockBuilder(interface_exists('React\EventLoop\TimerInterface') ? 'React\EventLoop\TimerInterface' : 'React\EventLoop\Timer\TimerInterface')->getMock();
         $loop->expects($this->once())->method('addTimer')->will($this->returnValue($timer));
 
         $promise = Timer\resolve(0.01, $loop);
