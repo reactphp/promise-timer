@@ -55,10 +55,12 @@ function resolve($time, LoopInterface $loop)
         $timer = $loop->addTimer($time, function () use ($time, $resolve) {
             $resolve($time);
         });
-    }, function ($resolveUnused, $reject) use (&$timer, $loop) {
+    }, function ($resolve, $reject, $notify) use (&$timer, $loop) {
         // cancelling this promise will cancel the timer and reject
         $loop->cancelTimer($timer);
-        $reject(new \RuntimeException('Timer cancelled'));
+
+        $resolve = $reject = $notify = $timer = $loop = null;
+        throw new \RuntimeException('Timer cancelled');
     });
 }
 
