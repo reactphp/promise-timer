@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.0 (2018-04-24)
+
+*   Feature: Improve memory consumption by cleaning up unneeded references.
+    (#32 by @clue)
+
 ## 1.2.1 (2017-12-22)
 
 *    README improvements
