@@ -13,7 +13,12 @@ function timeout(PromiseInterface $promise, $time, LoopInterface $loop)
     // thus leaving responsibility to the input promise.
     $canceller = null;
     if ($promise instanceof CancellablePromiseInterface) {
-        $canceller = array($promise, 'cancel');
+        // pass promise by reference to clean reference after cancellation handler
+        // has been invoked once in order to avoid garbage references in call stack.
+        $canceller = function () use (&$promise) {
+            $promise->cancel();
+            $promise = null;
+        };
     }
 
     return new Promise(function ($resolve, $reject) use ($loop, $time, $promise) {
@@ -38,12 +43,15 @@ function timeout(PromiseInterface $promise, $time, LoopInterface $loop)
         }
 
         // start timeout timer which will cancel the input promise
-        $timer = $loop->addTimer($time, function () use ($time, $promise, $reject) {
+        $timer = $loop->addTimer($time, function () use ($time, &$promise, $reject) {
             $reject(new TimeoutException($time, 'Timed out after ' . $time . ' seconds'));
 
+            // try to invoke cancellation handler of input promise and then clean
+            // reference in order to avoid garbage references in call stack.
             if ($promise instanceof CancellablePromiseInterface) {
                 $promise->cancel();
             }
+            $promise = null;
         });
     }, $canceller);
 }
@@ -55,11 +63,12 @@ function resolve($time, LoopInterface $loop)
         $timer = $loop->addTimer($time, function () use ($time, $resolve) {
             $resolve($time);
         });
-    }, function ($resolve, $reject, $notify) use (&$timer, $loop) {
-        // cancelling this promise will cancel the timer and reject
+    }, function () use (&$timer, $loop) {
+        // cancelling this promise will cancel the timer, clean the reference
+        // in order to avoid garbage references in call stack and then reject.
         $loop->cancelTimer($timer);
+        $timer = null;
 
-        $resolve = $reject = $notify = $timer = $loop = null;
         throw new \RuntimeException('Timer cancelled');
     });
 }
