@@ -5,7 +5,7 @@ namespace React\Tests\Promise\Timer;
 use React\Promise\Timer;
 use React\Promise;
 
-class FunctionTimerTest extends TestCase
+class FunctionTimeoutTest extends TestCase
 {
     public function testResolvedWillResolveRightAway()
     {
@@ -165,5 +165,81 @@ class FunctionTimerTest extends TestCase
 
         $this->expectPromiseResolved($promise);
         $this->expectPromiseResolved($timeout);
+    }
+
+    public function testWaitingForPromiseToResolveBeforeTimeoutDoesNotLeaveGarbageCycles()
+    {
+        if (class_exists('React\Promise\When')) {
+            $this->markTestSkipped('Not supported on legacy Promise v1 API');
+        }
+
+        gc_collect_cycles();
+
+        $promise = Timer\resolve(0.01, $this->loop);
+
+        $promise = Timer\timeout($promise, 1.0, $this->loop);
+
+        $this->loop->run();
+        unset($promise);
+
+        $this->assertEquals(0, gc_collect_cycles());
+    }
+
+    public function testWaitingForPromiseToRejectBeforeTimeoutDoesNotLeaveGarbageCycles()
+    {
+        if (class_exists('React\Promise\When')) {
+            $this->markTestSkipped('Not supported on legacy Promise v1 API');
+        }
+
+        gc_collect_cycles();
+
+        $promise = Timer\reject(0.01, $this->loop);
+
+        $promise = Timer\timeout($promise, 1.0, $this->loop);
+
+        $this->loop->run();
+        unset($promise);
+
+        $this->assertEquals(0, gc_collect_cycles());
+    }
+
+    public function testWaitingForPromiseToTimeoutDoesNotLeaveGarbageCycles()
+    {
+        if (class_exists('React\Promise\When')) {
+            $this->markTestSkipped('Not supported on legacy Promise v1 API');
+        }
+
+        gc_collect_cycles();
+
+        $promise = new \React\Promise\Promise(function () { }, function () {
+            throw new \RuntimeException();
+        });
+
+        $promise = Timer\timeout($promise, 0.01, $this->loop);
+
+        $this->loop->run();
+        unset($promise);
+
+        $this->assertEquals(0, gc_collect_cycles());
+    }
+
+    public function testCancellingPromiseDoesNotLeaveGarbageCycles()
+    {
+        if (class_exists('React\Promise\When')) {
+            $this->markTestSkipped('Not supported on legacy Promise v1 API');
+        }
+
+        gc_collect_cycles();
+
+        $promise = new \React\Promise\Promise(function () { }, function () {
+            throw new \RuntimeException();
+        });
+
+        $loop = $this->getMockBuilder('React\EventLoop\LoopInterface')->getMock();
+        $promise = Timer\timeout($promise, 0.01, $loop);
+        $promise->cancel();
+        unset($promise);
+
+        $this->assertEquals(0, gc_collect_cycles());
     }
 }

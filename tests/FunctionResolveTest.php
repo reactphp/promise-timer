@@ -60,12 +60,42 @@ class FunctionResolveTest extends TestCase
         $promise->cancel();
     }
 
-    public function testCancelingPromiseWillRejectTimer()
+    public function testCancellingPromiseWillRejectTimer()
     {
         $promise = Timer\resolve(0.01, $this->loop);
 
         $promise->cancel();
 
         $this->expectPromiseRejected($promise);
+    }
+
+    public function testWaitingForPromiseToResolveDoesNotLeaveGarbageCycles()
+    {
+        if (class_exists('React\Promise\When')) {
+            $this->markTestSkipped('Not supported on legacy Promise v1 API');
+        }
+
+        gc_collect_cycles();
+
+        $promise = Timer\resolve(0.01, $this->loop);
+        $this->loop->run();
+        unset($promise);
+
+        $this->assertEquals(0, gc_collect_cycles());
+    }
+
+    public function testCancellingPromiseDoesNotLeaveGarbageCycles()
+    {
+        if (class_exists('React\Promise\When')) {
+            $this->markTestSkipped('Not supported on legacy Promise v1 API');
+        }
+
+        gc_collect_cycles();
+
+        $promise = Timer\resolve(0.01, $this->loop);
+        $promise->cancel();
+        unset($promise);
+
+        $this->assertEquals(0, gc_collect_cycles());
     }
 }
