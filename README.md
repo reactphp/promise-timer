@@ -39,7 +39,7 @@ Alternatively, you can also refer to them with their fully-qualified name:
 
 ```php
 \React\Promise\Timer\timeout(…);
-``` 
+```
 
 ### timeout()
 
@@ -338,11 +338,11 @@ The `getTimeout()` method can be used to get the timeout value in seconds.
 The recommended way to install this library is [through Composer](https://getcomposer.org).
 [New to Composer?](https://getcomposer.org/doc/00-intro.md)
 
-This project follows [SemVer](http://semver.org/).
+This project follows [SemVer](https://semver.org/).
 This will install the latest supported version:
 
 ```bash
-$ composer require react/promise-timer:^1.3
+$ composer require react/promise-timer:^1.4
 ```
 
 See also the [CHANGELOG](CHANGELOG.md) for details about version upgrades.
