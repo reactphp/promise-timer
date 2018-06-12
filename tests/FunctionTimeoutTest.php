@@ -71,10 +71,13 @@ class FunctionTimeoutTest extends TestCase
         $this->expectPromiseRejected($promise);
     }
 
-    public function testPendingCancellableWillBeCancelledOnTimeout()
+    public function testPendingCancellableWillBeCancelledThroughFollowerOnTimeout()
     {
+        $cancellable = $this->getMockBuilder('React\Promise\CancellablePromiseInterface')->getMock();
+        $cancellable->expects($this->once())->method('cancel');
+
         $promise = $this->getMockBuilder('React\Promise\CancellablePromiseInterface')->getMock();
-        $promise->expects($this->once())->method('cancel');
+        $promise->expects($this->once())->method('then')->willReturn($cancellable);
 
         Timer\timeout($promise, 0.01, $this->loop);
 
@@ -213,6 +216,44 @@ class FunctionTimeoutTest extends TestCase
 
         $promise = new \React\Promise\Promise(function () { }, function () {
             throw new \RuntimeException();
+        });
+
+        $promise = Timer\timeout($promise, 0.01, $this->loop);
+
+        $this->loop->run();
+        unset($promise);
+
+        $this->assertEquals(0, gc_collect_cycles());
+    }
+
+    public function testWaitingForPromiseToTimeoutWithoutCancellerDoesNotLeaveGarbageCycles()
+    {
+        if (class_exists('React\Promise\When')) {
+            $this->markTestSkipped('Not supported on legacy Promise v1 API');
+        }
+
+        gc_collect_cycles();
+
+        $promise = new \React\Promise\Promise(function () { });
+
+        $promise = Timer\timeout($promise, 0.01, $this->loop);
+
+        $this->loop->run();
+        unset($promise);
+
+        $this->assertEquals(0, gc_collect_cycles());
+    }
+
+    public function testWaitingForPromiseToTimeoutWithNoOpCancellerDoesNotLeaveGarbageCycles()
+    {
+        if (class_exists('React\Promise\When')) {
+            $this->markTestSkipped('Not supported on legacy Promise v1 API');
+        }
+
+        gc_collect_cycles();
+
+        $promise = new \React\Promise\Promise(function () { }, function () {
+            // no-op
         });
 
         $promise = Timer\timeout($promise, 0.01, $this->loop);
