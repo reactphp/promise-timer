@@ -23,7 +23,7 @@ function timeout(PromiseInterface $promise, $time, LoopInterface $loop)
 
     return new Promise(function ($resolve, $reject) use ($loop, $time, $promise) {
         $timer = null;
-        $promise->then(function ($v) use (&$timer, $loop, $resolve) {
+        $promise = $promise->then(function ($v) use (&$timer, $loop, $resolve) {
             if ($timer) {
                 $loop->cancelTimer($timer);
             }
