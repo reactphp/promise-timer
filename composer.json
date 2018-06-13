@@ -2,7 +2,7 @@
     "name": "react/promise-timer",
     "description": "A trivial implementation of timeouts for Promises, built on top of ReactPHP.",
     "keywords": ["Promise", "timeout", "timer", "event-loop", "ReactPHP", "async"],
-    "homepage": "https://github.com/react/promise-timer",
+    "homepage": "https://github.com/reactphp/promise-timer",
     "license": "MIT",
     "authors": [
         {

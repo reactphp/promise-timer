@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.5.0 (2018-06-13)
+
+*   Feature: Improve memory consumption by cleaning up garbage references to pending promise without canceller.
+    (#34 by @clue)
+
 ## 1.4.0 (2018-06-11)
 
 *   Feature: Improve memory consumption by cleaning up garbage references.
