@@ -12,7 +12,7 @@
     ],
     "autoload": {
         "psr-4": { "React\\Promise\\Timer\\": "src/" },
-        "files": [ "src/functions.php" ]
+        "files": [ "src/functions_include.php" ]
     },
     "autoload-dev": {
         "psr-4": { "React\\Tests\\Promise\\Timer\\": "tests/" }
