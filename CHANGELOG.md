@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.5.1 (2019-03-27)
+
+*   Fix: Typo in readme
+    (#35 by @aak74)
+
+*   Improvement: Only include functions file when functions aren't defined
+    (#36 by @Niko9911)
+
 ## 1.5.0 (2018-06-13)
 
 *   Feature: Improve memory consumption by cleaning up garbage references to pending promise without canceller.
