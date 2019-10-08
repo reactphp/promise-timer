@@ -40,7 +40,7 @@ class FunctionTimeoutTest extends TestCase
 
     public function testRejectedWillRejectRightAway()
     {
-        $promise = Promise\reject();
+        $promise = Promise\reject(new \Exception('reject'));
 
         $promise = Timer\timeout($promise, 3, $this->loop);
 
@@ -49,7 +49,7 @@ class FunctionTimeoutTest extends TestCase
 
     public function testRejectedWillNotStartTimer()
     {
-        $promise = Promise\reject();
+        $promise = Promise\reject(new \Exception('reject'));
 
         Timer\timeout($promise, 3, $this->loop);
 
@@ -73,10 +73,12 @@ class FunctionTimeoutTest extends TestCase
 
     public function testPendingCancellableWillBeCancelledThroughFollowerOnTimeout()
     {
-        $cancellable = $this->getMockBuilder('React\Promise\CancellablePromiseInterface')->getMock();
+        $cancellableInterface = interface_exists('React\Promise\CancellablePromiseInterface') ?
+            'React\Promise\CancellablePromiseInterface' : 'React\Promise\PromiseInterface';
+        $cancellable = $this->getMockBuilder($cancellableInterface)->getMock();
         $cancellable->expects($this->once())->method('cancel');
 
-        $promise = $this->getMockBuilder('React\Promise\CancellablePromiseInterface')->getMock();
+        $promise = $this->getMockBuilder($cancellableInterface)->getMock();
         $promise->expects($this->once())->method('then')->willReturn($cancellable);
 
         Timer\timeout($promise, 0.01, $this->loop);
