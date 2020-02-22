@@ -176,6 +176,10 @@ class FunctionTimeoutTest extends TestCase
             $this->markTestSkipped('Not supported on legacy Promise v1 API');
         }
 
+        if ($this->getTestResultObject()->getCollectCodeCoverageInformation() === true) {
+            $this->markTestSkipped('This test has memory leaks when code coverage is collected');
+        }
+
         gc_collect_cycles();
 
         $promise = Timer\resolve(0.01, $this->loop);
@@ -194,6 +198,10 @@ class FunctionTimeoutTest extends TestCase
             $this->markTestSkipped('Not supported on legacy Promise v1 API');
         }
 
+        if ($this->getTestResultObject()->getCollectCodeCoverageInformation() === true) {
+            $this->markTestSkipped('This test has memory leaks when code coverage is collected');
+        }
+
         gc_collect_cycles();
 
         $promise = Timer\reject(0.01, $this->loop);
@@ -210,6 +218,10 @@ class FunctionTimeoutTest extends TestCase
     {
         if (class_exists('React\Promise\When')) {
             $this->markTestSkipped('Not supported on legacy Promise v1 API');
+        }
+
+        if ($this->getTestResultObject()->getCollectCodeCoverageInformation() === true) {
+            $this->markTestSkipped('This test has memory leaks when code coverage is collected');
         }
 
         gc_collect_cycles();
@@ -232,6 +244,10 @@ class FunctionTimeoutTest extends TestCase
             $this->markTestSkipped('Not supported on legacy Promise v1 API');
         }
 
+        if ($this->getTestResultObject()->getCollectCodeCoverageInformation() === true) {
+            $this->markTestSkipped('This test has memory leaks when code coverage is collected');
+        }
+
         gc_collect_cycles();
 
         $promise = new \React\Promise\Promise(function () { });
@@ -248,6 +264,10 @@ class FunctionTimeoutTest extends TestCase
     {
         if (class_exists('React\Promise\When')) {
             $this->markTestSkipped('Not supported on legacy Promise v1 API');
+        }
+
+        if ($this->getTestResultObject()->getCollectCodeCoverageInformation() === true) {
+            $this->markTestSkipped('This test has memory leaks when code coverage is collected');
         }
 
         gc_collect_cycles();
@@ -268,6 +288,10 @@ class FunctionTimeoutTest extends TestCase
     {
         if (class_exists('React\Promise\When')) {
             $this->markTestSkipped('Not supported on legacy Promise v1 API');
+        }
+
+        if ($this->getTestResultObject()->getCollectCodeCoverageInformation() === true) {
+            $this->markTestSkipped('This test has memory leaks when code coverage is collected');
         }
 
         gc_collect_cycles();
