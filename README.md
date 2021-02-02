@@ -1,6 +1,6 @@
 # PromiseTimer
 
-[![Build Status](https://travis-ci.org/reactphp/promise-timer.svg?branch=master)](https://travis-ci.org/reactphp/promise-timer)
+[![CI status](https://github.com/reactphp/promise-timer/workflows/CI/badge.svg)](https://github.com/reactphp/promise-timer/actions)
 
 A trivial implementation of timeouts for `Promise`s, built on top of [ReactPHP](https://reactphp.org/).
 
