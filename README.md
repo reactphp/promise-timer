@@ -43,7 +43,7 @@ Alternatively, you can also refer to them with their fully-qualified name:
 
 ### timeout()
 
-The `timeout(PromiseInterface $promise, $time, LoopInterface $loop)` function
+The `timeout(PromiseInterface $promise, $time, LoopInterface $loop = null)` function
 can be used to *cancel* operations that take *too long*.
 You need to pass in an input `$promise` that represents a pending operation and timeout parameters.
 It returns a new `Promise` with the following resolution behavior:
@@ -60,11 +60,17 @@ start a timer and will thus trigger at the earliest possible time in the future.
 If the input `$promise` is already settled, then the resulting promise will
 resolve or reject immediately without starting a timer at all.
 
+This function takes an optional `LoopInterface|null $loop` parameter that can be used to
+pass the event loop instance to use. You can use a `null` value here in order to
+use the [default loop](https://github.com/reactphp/event-loop#loop). This value
+SHOULD NOT be given unless you're sure you want to explicitly use a given event
+loop instance.
+
 A common use case for handling only resolved values looks like this:
 
 ```php
 $promise = accessSomeRemoteResource();
-Timer\timeout($promise, 10.0, $loop)->then(function ($value) {
+Timer\timeout($promise, 10.0)->then(function ($value) {
     // the operation finished within 10.0 seconds
 });
 ```
@@ -73,7 +79,7 @@ A more complete example could look like this:
 
 ```php
 $promise = accessSomeRemoteResource();
-Timer\timeout($promise, 10.0, $loop)->then(
+Timer\timeout($promise, 10.0)->then(
     function ($value) {
         // the operation finished within 10.0 seconds
     },
@@ -90,7 +96,7 @@ Timer\timeout($promise, 10.0, $loop)->then(
 Or if you're using [react/promise v2.2.0](https://github.com/reactphp/promise) or up:
 
 ```php
-Timer\timeout($promise, 10.0, $loop)
+Timer\timeout($promise, 10.0)
     ->then(function ($value) {
         // the operation finished within 10.0 seconds
     })
@@ -172,7 +178,7 @@ input `$promise`, as demonstrated in the following example:
 
 ```php
 $promise = accessSomeRemoteResource();
-$timeout = Timer\timeout($promise, 10.0, $loop);
+$timeout = Timer\timeout($promise, 10.0);
 
 $promise->cancel();
 ```
@@ -195,7 +201,7 @@ Similarily, you can also explicitly `cancel()` the resulting promise like this:
 
 ```php
 $promise = accessSomeRemoteResource();
-$timeout = Timer\timeout($promise, 10.0, $loop);
+$timeout = Timer\timeout($promise, 10.0);
 
 $timeout->cancel();
 ```
@@ -231,7 +237,7 @@ This is done for consistency with the [timeout cancellation](#timeout-cancellati
 handling and also because it is assumed this is often used like this:
 
 ```php
-$timeout = Timer\timeout(accessSomeRemoteResource(), 10.0, $loop);
+$timeout = Timer\timeout(accessSomeRemoteResource(), 10.0);
 
 $timeout->cancel();
 ```
@@ -258,7 +264,7 @@ $promises = array(
 
 $promise = \React\Promise\all($promises);
 
-Timer\timeout($promise, 10, $loop)->then(function ($values) {
+Timer\timeout($promise, 10)->then(function ($values) {
     // *all* promises resolved
 });
 ```
@@ -270,11 +276,11 @@ For more details on the promise primitives, please refer to the
 
 ### resolve()
 
-The `resolve($time, LoopInterface $loop)` function can be used to create a new Promise that
+The `resolve($time, LoopInterface $loop = null)` function can be used to create a new Promise that
 resolves in `$time` seconds with the `$time` as the fulfillment value.
 
 ```php
-Timer\resolve(1.5, $loop)->then(function ($time) {
+Timer\resolve(1.5)->then(function ($time) {
     echo 'Thanks for waiting ' . $time . ' seconds' . PHP_EOL;
 });
 ```
@@ -284,12 +290,18 @@ resolve the promise once it triggers.
 This implies that if you pass a really small (or negative) value, it will still
 start a timer and will thus trigger at the earliest possible time in the future.
 
+This function takes an optional `LoopInterface|null $loop` parameter that can be used to
+pass the event loop instance to use. You can use a `null` value here in order to
+use the [default loop](https://github.com/reactphp/event-loop#loop). This value
+SHOULD NOT be given unless you're sure you want to explicitly use a given event
+loop instance.
+
 #### Resolve cancellation
 
 You can explicitly `cancel()` the resulting timer promise at any time:
 
 ```php
-$timer = Timer\resolve(2.0, $loop);
+$timer = Timer\resolve(2.0);
 
 $timer->cancel();
 ```
@@ -298,11 +310,11 @@ This will abort the timer and *reject* with a `RuntimeException`.
 
 ### reject()
 
-The `reject($time, LoopInterface $loop)` function can be used to create a new Promise
+The `reject($time, LoopInterface $loop = null)` function can be used to create a new Promise
 which rejects in `$time` seconds with a `TimeoutException`.
 
 ```php
-Timer\reject(2.0, $loop)->then(null, function (TimeoutException $e) {
+Timer\reject(2.0)->then(null, function (TimeoutException $e) {
     echo 'Rejected after ' . $e->getTimeout() . ' seconds ' . PHP_EOL;
 });
 ```
@@ -312,6 +324,12 @@ reject the promise once it triggers.
 This implies that if you pass a really small (or negative) value, it will still
 start a timer and will thus trigger at the earliest possible time in the future.
 
+This function takes an optional `LoopInterface|null $loop` parameter that can be used to
+pass the event loop instance to use. You can use a `null` value here in order to
+use the [default loop](https://github.com/reactphp/event-loop#loop). This value
+SHOULD NOT be given unless you're sure you want to explicitly use a given event
+loop instance.
+
 This function complements the [`resolve()`](#resolve) function
 and can be used as a basic building block for higher-level promise consumers.
 
@@ -320,7 +338,7 @@ and can be used as a basic building block for higher-level promise consumers.
 You can explicitly `cancel()` the resulting timer promise at any time:
 
 ```php
-$timer = Timer\reject(2.0, $loop);
+$timer = Timer\reject(2.0);
 
 $timer->cancel();
 ```
