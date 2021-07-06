@@ -35,7 +35,7 @@
     },
     "require": {
         "php": ">=5.3",
-        "react/event-loop": "dev-master#78f7f43 as 1.2.0",
+        "react/event-loop": "^1.2",
         "react/promise": "^3.0 || ^2.7.0 || ^1.2.1"
     },
     "require-dev": {
