@@ -2,38 +2,39 @@
 
 namespace React\Tests\Promise\Timer;
 
+use React\EventLoop\Loop;
 use React\Promise\Timer;
 
 class FunctionResolveTest extends TestCase
 {
     public function testPromiseIsPendingWithoutRunningLoop()
     {
-        $promise = Timer\resolve(0.01, $this->loop);
+        $promise = Timer\resolve(0.01);
 
         $this->expectPromisePending($promise);
     }
 
     public function testPromiseExpiredIsPendingWithoutRunningLoop()
     {
-        $promise = Timer\resolve(-1, $this->loop);
+        $promise = Timer\resolve(-1);
 
         $this->expectPromisePending($promise);
     }
 
     public function testPromiseWillBeResolvedOnTimeout()
     {
-        $promise = Timer\resolve(0.01, $this->loop);
+        $promise = Timer\resolve(0.01);
 
-        $this->loop->run();
+        Loop::run();
 
         $this->expectPromiseResolved($promise);
     }
 
     public function testPromiseExpiredWillBeResolvedOnTimeout()
     {
-        $promise = Timer\resolve(-1, $this->loop);
+        $promise = Timer\resolve(-1);
 
-        $this->loop->run();
+        Loop::run();
 
         $this->expectPromiseResolved($promise);
     }
@@ -62,7 +63,7 @@ class FunctionResolveTest extends TestCase
 
     public function testCancellingPromiseWillRejectTimer()
     {
-        $promise = Timer\resolve(0.01, $this->loop);
+        $promise = Timer\resolve(0.01);
 
         $promise->cancel();
 
@@ -77,8 +78,8 @@ class FunctionResolveTest extends TestCase
 
         gc_collect_cycles();
 
-        $promise = Timer\resolve(0.01, $this->loop);
-        $this->loop->run();
+        $promise = Timer\resolve(0.01);
+        Loop::run();
         unset($promise);
 
         $this->assertEquals(0, gc_collect_cycles());
@@ -92,7 +93,7 @@ class FunctionResolveTest extends TestCase
 
         gc_collect_cycles();
 
-        $promise = Timer\resolve(0.01, $this->loop);
+        $promise = Timer\resolve(0.01);
         $promise->cancel();
         unset($promise);
 

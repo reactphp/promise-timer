@@ -3,20 +3,9 @@
 namespace React\Tests\Promise\Timer;
 
 use PHPUnit\Framework\TestCase as BaseTestCase;
-use React\EventLoop\Factory;
 
 class TestCase extends BaseTestCase
 {
-    protected $loop;
-
-    /**
-     * @before
-     */
-    public function setUpLoop()
-    {
-        $this->loop = Factory::create();
-    }
-
     protected function expectCallableOnce()
     {
         $mock = $this->createCallableMock();

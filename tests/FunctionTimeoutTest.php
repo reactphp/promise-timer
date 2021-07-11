@@ -2,8 +2,9 @@
 
 namespace React\Tests\Promise\Timer;
 
-use React\Promise\Timer;
+use React\EventLoop\Loop;
 use React\Promise;
+use React\Promise\Timer;
 
 class FunctionTimeoutTest extends TestCase
 {
@@ -11,7 +12,7 @@ class FunctionTimeoutTest extends TestCase
     {
         $promise = Promise\resolve();
 
-        $promise = Timer\timeout($promise, 3, $this->loop);
+        $promise = Timer\timeout($promise, 3);
 
         $this->expectPromiseResolved($promise);
     }
@@ -20,7 +21,7 @@ class FunctionTimeoutTest extends TestCase
     {
         $promise = Promise\resolve();
 
-        $promise = Timer\timeout($promise, -1, $this->loop);
+        $promise = Timer\timeout($promise, -1);
 
         $this->expectPromiseResolved($promise);
     }
@@ -29,10 +30,10 @@ class FunctionTimeoutTest extends TestCase
     {
         $promise = Promise\resolve();
 
-        Timer\timeout($promise, 3, $this->loop);
+        Timer\timeout($promise, 3);
 
         $time = microtime(true);
-        $this->loop->run();
+        Loop::run();
         $time = microtime(true) - $time;
 
         $this->assertLessThan(0.5, $time);
@@ -42,7 +43,7 @@ class FunctionTimeoutTest extends TestCase
     {
         $promise = Promise\reject(new \Exception('reject'));
 
-        $promise = Timer\timeout($promise, 3, $this->loop);
+        $promise = Timer\timeout($promise, 3);
 
         $this->expectPromiseRejected($promise);
     }
@@ -51,10 +52,10 @@ class FunctionTimeoutTest extends TestCase
     {
         $promise = Promise\reject(new \Exception('reject'));
 
-        Timer\timeout($promise, 3, $this->loop);
+        Timer\timeout($promise, 3);
 
         $time = microtime(true);
-        $this->loop->run();
+        Loop::run();
         $time = microtime(true) - $time;
 
         $this->assertLessThan(0.5, $time);
@@ -64,9 +65,9 @@ class FunctionTimeoutTest extends TestCase
     {
         $promise = $this->getMockBuilder('React\Promise\PromiseInterface')->getMock();
 
-        $promise = Timer\timeout($promise, 0.01, $this->loop);
+        $promise = Timer\timeout($promise, 0.01);
 
-        $this->loop->run();
+        Loop::run();
 
         $this->expectPromiseRejected($promise);
     }
@@ -81,9 +82,9 @@ class FunctionTimeoutTest extends TestCase
         $promise = $this->getMockBuilder($cancellableInterface)->getMock();
         $promise->expects($this->once())->method('then')->willReturn($cancellable);
 
-        Timer\timeout($promise, 0.01, $this->loop);
+        Timer\timeout($promise, 0.01);
 
-        $this->loop->run();
+        Loop::run();
     }
 
     public function testCancelTimeoutWithoutCancellationhandlerWillNotCancelTimerAndWillNotReject()
@@ -131,7 +132,7 @@ class FunctionTimeoutTest extends TestCase
     {
         $promise = new \React\Promise\Promise(function () { }, $this->expectCallableOnce());
 
-        $timeout = Timer\timeout($promise, 0.01, $this->loop);
+        $timeout = Timer\timeout($promise, 0.01);
 
         $timeout->cancel();
     }
@@ -140,7 +141,7 @@ class FunctionTimeoutTest extends TestCase
     {
         $promise = new \React\Promise\Promise(function () { }, function ($resolve, $reject) { $reject(); });
 
-        $timeout = Timer\timeout($promise, 0.01, $this->loop);
+        $timeout = Timer\timeout($promise, 0.01);
 
         $promise->cancel();
 
@@ -152,7 +153,7 @@ class FunctionTimeoutTest extends TestCase
     {
         $promise = new \React\Promise\Promise(function () { }, function ($resolve, $reject) { $reject(); });
 
-        $timeout = Timer\timeout($promise, 0.01, $this->loop);
+        $timeout = Timer\timeout($promise, 0.01);
 
         $timeout->cancel();
 
@@ -164,7 +165,7 @@ class FunctionTimeoutTest extends TestCase
     {
         $promise = new \React\Promise\Promise(function () { }, function ($resolve, $reject) { $resolve(); });
 
-        $timeout = Timer\timeout($promise, 0.01, $this->loop);
+        $timeout = Timer\timeout($promise, 0.01);
 
         $timeout->cancel();
 
@@ -180,11 +181,11 @@ class FunctionTimeoutTest extends TestCase
 
         gc_collect_cycles();
 
-        $promise = Timer\resolve(0.01, $this->loop);
+        $promise = Timer\resolve(0.01);
 
-        $promise = Timer\timeout($promise, 1.0, $this->loop);
+        $promise = Timer\timeout($promise, 1.0);
 
-        $this->loop->run();
+        Loop::run();
         unset($promise);
 
         $this->assertEquals(0, gc_collect_cycles());
@@ -198,11 +199,11 @@ class FunctionTimeoutTest extends TestCase
 
         gc_collect_cycles();
 
-        $promise = Timer\reject(0.01, $this->loop);
+        $promise = Timer\reject(0.01);
 
-        $promise = Timer\timeout($promise, 1.0, $this->loop);
+        $promise = Timer\timeout($promise, 1.0);
 
-        $this->loop->run();
+        Loop::run();
         unset($promise);
 
         $this->assertEquals(0, gc_collect_cycles());
@@ -220,9 +221,9 @@ class FunctionTimeoutTest extends TestCase
             throw new \RuntimeException();
         });
 
-        $promise = Timer\timeout($promise, 0.01, $this->loop);
+        $promise = Timer\timeout($promise, 0.01);
 
-        $this->loop->run();
+        Loop::run();
         unset($promise);
 
         $this->assertEquals(0, gc_collect_cycles());
@@ -238,9 +239,9 @@ class FunctionTimeoutTest extends TestCase
 
         $promise = new \React\Promise\Promise(function () { });
 
-        $promise = Timer\timeout($promise, 0.01, $this->loop);
+        $promise = Timer\timeout($promise, 0.01);
 
-        $this->loop->run();
+        Loop::run();
         unset($promise);
 
         $this->assertEquals(0, gc_collect_cycles());
@@ -258,9 +259,9 @@ class FunctionTimeoutTest extends TestCase
             // no-op
         });
 
-        $promise = Timer\timeout($promise, 0.01, $this->loop);
+        $promise = Timer\timeout($promise, 0.01);
 
-        $this->loop->run();
+        Loop::run();
         unset($promise);
 
         $this->assertEquals(0, gc_collect_cycles());
