@@ -7,17 +7,17 @@ A trivial implementation of timeouts for `Promise`s, built on top of [ReactPHP](
 **Table of contents**
 
 * [Usage](#usage)
-  * [timeout()](#timeout)
-    * [Timeout cancellation](#timeout-cancellation)
-    * [Cancellation handler](#cancellation-handler)
-    * [Input cancellation](#input-cancellation)
-    * [Output cancellation](#output-cancellation)
-    * [Collections](#collections)
-  * [resolve()](#resolve)
-    * [Resolve cancellation](#resolve-cancellation)
-  * [reject()](#reject)
-    * [Reject cancellation](#reject-cancellation)
-  * [TimeoutException](#timeoutexception)
+    * [timeout()](#timeout)
+        * [Timeout cancellation](#timeout-cancellation)
+        * [Cancellation handler](#cancellation-handler)
+        * [Input cancellation](#input-cancellation)
+        * [Output cancellation](#output-cancellation)
+        * [Collections](#collections)
+    * [resolve()](#resolve)
+        * [Resolve cancellation](#resolve-cancellation)
+    * [reject()](#reject)
+        * [Reject cancellation](#reject-cancellation)
+    * [TimeoutException](#timeoutexception)
 * [Install](#install)
 * [Tests](#tests)
 * [License](#license)
@@ -27,18 +27,26 @@ A trivial implementation of timeouts for `Promise`s, built on top of [ReactPHP](
 This lightweight library consists only of a few simple functions.
 All functions reside under the `React\Promise\Timer` namespace.
 
-The below examples assume you use an import statement similar to this:
+The below examples refer to all functions with their fully-qualified names like this:
+
+```php
+React\Promise\Timer\timeout(…);
+```
+
+As of PHP 5.6+ you can also import each required function into your code like this:
+
+```php
+use function React\Promise\Timer\timeout;
+
+timeout(…);
+```
+
+Alternatively, you can also use an import statement similar to this:
 
 ```php
 use React\Promise\Timer;
 
 Timer\timeout(…);
-```
-
-Alternatively, you can also refer to them with their fully-qualified name:
-
-```php
-\React\Promise\Timer\timeout(…);
 ```
 
 ### timeout()
@@ -70,7 +78,7 @@ A common use case for handling only resolved values looks like this:
 
 ```php
 $promise = accessSomeRemoteResource();
-Timer\timeout($promise, 10.0)->then(function ($value) {
+React\Promise\Timer\timeout($promise, 10.0)->then(function ($value) {
     // the operation finished within 10.0 seconds
 });
 ```
@@ -79,12 +87,12 @@ A more complete example could look like this:
 
 ```php
 $promise = accessSomeRemoteResource();
-Timer\timeout($promise, 10.0)->then(
+React\Promise\Timer\timeout($promise, 10.0)->then(
     function ($value) {
         // the operation finished within 10.0 seconds
     },
     function ($error) {
-        if ($error instanceof Timer\TimeoutException) {
+        if ($error instanceof React\Promise\Timer\TimeoutException) {
             // the operation has failed due to a timeout
         } else {
             // the input operation has failed due to some other error
@@ -96,11 +104,11 @@ Timer\timeout($promise, 10.0)->then(
 Or if you're using [react/promise v2.2.0](https://github.com/reactphp/promise) or up:
 
 ```php
-Timer\timeout($promise, 10.0)
+React\Promise\Timer\timeout($promise, 10.0)
     ->then(function ($value) {
         // the operation finished within 10.0 seconds
     })
-    ->otherwise(function (Timer\TimeoutException $error) {
+    ->otherwise(function (React\Promise\Timer\TimeoutException $error) {
         // the operation has failed due to a timeout
     })
     ->otherwise(function ($error) {
@@ -178,7 +186,7 @@ input `$promise`, as demonstrated in the following example:
 
 ```php
 $promise = accessSomeRemoteResource();
-$timeout = Timer\timeout($promise, 10.0);
+$timeout = React\Promise\Timer\timeout($promise, 10.0);
 
 $promise->cancel();
 ```
@@ -201,7 +209,7 @@ Similarily, you can also explicitly `cancel()` the resulting promise like this:
 
 ```php
 $promise = accessSomeRemoteResource();
-$timeout = Timer\timeout($promise, 10.0);
+$timeout = React\Promise\Timer\timeout($promise, 10.0);
 
 $timeout->cancel();
 ```
@@ -237,7 +245,7 @@ This is done for consistency with the [timeout cancellation](#timeout-cancellati
 handling and also because it is assumed this is often used like this:
 
 ```php
-$timeout = Timer\timeout(accessSomeRemoteResource(), 10.0);
+$timeout = React\Promise\Timer\timeout(accessSomeRemoteResource(), 10.0);
 
 $timeout->cancel();
 ```
@@ -264,7 +272,7 @@ $promises = array(
 
 $promise = \React\Promise\all($promises);
 
-Timer\timeout($promise, 10)->then(function ($values) {
+React\Promise\Timer\timeout($promise, 10)->then(function ($values) {
     // *all* promises resolved
 });
 ```
@@ -280,7 +288,7 @@ The `resolve($time, LoopInterface $loop = null)` function can be used to create 
 resolves in `$time` seconds with the `$time` as the fulfillment value.
 
 ```php
-Timer\resolve(1.5)->then(function ($time) {
+React\Promise\Timer\resolve(1.5)->then(function ($time) {
     echo 'Thanks for waiting ' . $time . ' seconds' . PHP_EOL;
 });
 ```
@@ -301,7 +309,7 @@ loop instance.
 You can explicitly `cancel()` the resulting timer promise at any time:
 
 ```php
-$timer = Timer\resolve(2.0);
+$timer = React\Promise\Timer\resolve(2.0);
 
 $timer->cancel();
 ```
@@ -314,7 +322,7 @@ The `reject($time, LoopInterface $loop = null)` function can be used to create a
 which rejects in `$time` seconds with a `TimeoutException`.
 
 ```php
-Timer\reject(2.0)->then(null, function (TimeoutException $e) {
+React\Promise\Timer\reject(2.0)->then(null, function (React\Promise\Timer\TimeoutException $e) {
     echo 'Rejected after ' . $e->getTimeout() . ' seconds ' . PHP_EOL;
 });
 ```
@@ -338,7 +346,7 @@ and can be used as a basic building block for higher-level promise consumers.
 You can explicitly `cancel()` the resulting timer promise at any time:
 
 ```php
-$timer = Timer\reject(2.0);
+$timer = React\Promise\Timer\reject(2.0);
 
 $timer->cancel();
 ```
@@ -353,7 +361,7 @@ The `getTimeout()` method can be used to get the timeout value in seconds.
 
 ## Install
 
-The recommended way to install this library is [through Composer](https://getcomposer.org).
+The recommended way to install this library is [through Composer](https://getcomposer.org/).
 [New to Composer?](https://getcomposer.org/doc/00-intro.md)
 
 This project follows [SemVer](https://semver.org/).
@@ -368,12 +376,12 @@ See also the [CHANGELOG](CHANGELOG.md) for details about version upgrades.
 This project aims to run on any platform and thus does not require any PHP
 extensions and supports running on legacy PHP 5.3 through current PHP 8+ and
 HHVM.
-It's *highly recommended to use PHP 7+* for this project.
+It's *highly recommended to use the latest supported PHP version* for this project.
 
 ## Tests
 
 To run the test suite, you first need to clone this repo and then install all
-dependencies [through Composer](https://getcomposer.org):
+dependencies [through Composer](https://getcomposer.org/):
 
 ```bash
 $ composer install
@@ -382,7 +390,7 @@ $ composer install
 To run the test suite, go to the project root and run:
 
 ```bash
-$ php vendor/bin/phpunit
+$ vendor/bin/phpunit
 ```
 
 ## License
