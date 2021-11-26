@@ -18,6 +18,7 @@ A trivial implementation of timeouts for `Promise`s, built on top of [ReactPHP](
     * [reject()](#reject)
         * [Reject cancellation](#reject-cancellation)
     * [TimeoutException](#timeoutexception)
+        * [getTimeout()](#gettimeout)
 * [Install](#install)
 * [Tests](#tests)
 * [License](#license)
@@ -51,8 +52,8 @@ Timer\timeout(…);
 
 ### timeout()
 
-The `timeout(PromiseInterface $promise, $time, LoopInterface $loop = null)` function
-can be used to *cancel* operations that take *too long*.
+The `timeout(PromiseInterface<mixed, Exception|mixed> $promise, float $time, ?LoopInterface $loop = null): PromiseInterface<mixed, TimeoutException|Exception|mixed>` function can be used to
+*cancel* operations that take *too long*.
 You need to pass in an input `$promise` that represents a pending operation and timeout parameters.
 It returns a new `Promise` with the following resolution behavior:
 
@@ -284,8 +285,8 @@ For more details on the promise primitives, please refer to the
 
 ### resolve()
 
-The `resolve($time, LoopInterface $loop = null)` function can be used to create a new Promise that
-resolves in `$time` seconds with the `$time` as the fulfillment value.
+The `resolve(float $time, ?LoopInterface $loop = null): PromiseInterface<float, RuntimeException>` function can be used to
+create a new Promise that resolves in `$time` seconds with the `$time` as the fulfillment value.
 
 ```php
 React\Promise\Timer\resolve(1.5)->then(function ($time) {
@@ -318,8 +319,8 @@ This will abort the timer and *reject* with a `RuntimeException`.
 
 ### reject()
 
-The `reject($time, LoopInterface $loop = null)` function can be used to create a new Promise
-which rejects in `$time` seconds with a `TimeoutException`.
+The `reject(float $time, ?LoopInterface $loop = null): PromiseInterface<void, TimeoutException|RuntimeException>` function can be used to
+create a new Promise which rejects in `$time` seconds with a `TimeoutException`.
 
 ```php
 React\Promise\Timer\reject(2.0)->then(null, function (React\Promise\Timer\TimeoutException $e) {
@@ -357,7 +358,11 @@ This will abort the timer and *reject* with a `RuntimeException`.
 
 The `TimeoutException` extends PHP's built-in `RuntimeException`.
 
-The `getTimeout()` method can be used to get the timeout value in seconds.
+
+#### getTimeout()
+
+The `getTimeout(): float` method can be used to
+get the timeout value in seconds.
 
 ## Install
 

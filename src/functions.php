@@ -8,6 +8,12 @@ use React\Promise\CancellablePromiseInterface;
 use React\Promise\Promise;
 use React\Promise\PromiseInterface;
 
+/**
+ * @param PromiseInterface<mixed, \Exception|mixed> $promise
+ * @param float $time
+ * @param ?LoopInterface $loop
+ * @return PromiseInterface<mixed, TimeoutException|\Exception|mixed>
+ */
 function timeout(PromiseInterface $promise, $time, LoopInterface $loop = null)
 {
     // cancelling this promise will only try to cancel the input promise,
@@ -61,12 +67,18 @@ function timeout(PromiseInterface $promise, $time, LoopInterface $loop = null)
     }, $canceller);
 }
 
+/**
+ * @param float $time
+ * @param ?LoopInterface $loop
+ * @return PromiseInterface<float, \RuntimeException>
+ */
 function resolve($time, LoopInterface $loop = null)
 {
     if ($loop === null) {
         $loop = Loop::get();
     }
 
+    $timer = null;
     return new Promise(function ($resolve) use ($loop, $time, &$timer) {
         // resolve the promise when the timer fires in $time seconds
         $timer = $loop->addTimer($time, function () use ($time, $resolve) {
@@ -82,6 +94,11 @@ function resolve($time, LoopInterface $loop = null)
     });
 }
 
+/**
+ * @param float         $time
+ * @param LoopInterface $loop
+ * @return PromiseInterface<void, TimeoutException|\RuntimeException>
+ */
 function reject($time, LoopInterface $loop = null)
 {
     return resolve($time, $loop)->then(function ($time) {
