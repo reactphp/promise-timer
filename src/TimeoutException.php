@@ -23,6 +23,8 @@ class TimeoutException extends RuntimeException
     }
 
     /**
+     * Get the timeout value in seconds.
+     *
      * @return float
      */
     public function getTimeout()

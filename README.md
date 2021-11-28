@@ -8,15 +8,8 @@ A trivial implementation of timeouts for `Promise`s, built on top of [ReactPHP](
 
 * [Usage](#usage)
     * [timeout()](#timeout)
-        * [Timeout cancellation](#timeout-cancellation)
-        * [Cancellation handler](#cancellation-handler)
-        * [Input cancellation](#input-cancellation)
-        * [Output cancellation](#output-cancellation)
-        * [Collections](#collections)
     * [resolve()](#resolve)
-        * [Resolve cancellation](#resolve-cancellation)
     * [reject()](#reject)
-        * [Reject cancellation](#reject-cancellation)
     * [TimeoutException](#timeoutexception)
         * [getTimeout()](#gettimeout)
 * [Install](#install)
@@ -53,18 +46,25 @@ Timer\timeout(…);
 ### timeout()
 
 The `timeout(PromiseInterface<mixed, Exception|mixed> $promise, float $time, ?LoopInterface $loop = null): PromiseInterface<mixed, TimeoutException|Exception|mixed>` function can be used to
-*cancel* operations that take *too long*.
-You need to pass in an input `$promise` that represents a pending operation and timeout parameters.
-It returns a new `Promise` with the following resolution behavior:
+cancel operations that take *too long*.
 
-* If the input `$promise` resolves before `$time` seconds, resolve the resulting promise with its fulfillment value.
-* If the input `$promise` rejects before `$time` seconds, reject the resulting promise with its rejection value.
-* If the input `$promise` does not settle before `$time` seconds, *cancel* the operation and reject the resulting promise with a [`TimeoutException`](#timeoutexception).
+You need to pass in an input `$promise` that represents a pending operation
+and timeout parameters. It returns a new promise with the following
+resolution behavior:
+
+- If the input `$promise` resolves before `$time` seconds, resolve the
+  resulting promise with its fulfillment value.
+
+- If the input `$promise` rejects before `$time` seconds, reject the
+  resulting promise with its rejection value.
+
+- If the input `$promise` does not settle before `$time` seconds, *cancel*
+  the operation and reject the resulting promise with a [`TimeoutException`](#timeoutexception).
 
 Internally, the given `$time` value will be used to start a timer that will
-*cancel* the pending operation once it triggers.
-This implies that if you pass a really small (or negative) value, it will still
-start a timer and will thus trigger at the earliest possible time in the future.
+*cancel* the pending operation once it triggers. This implies that if you
+pass a really small (or negative) value, it will still start a timer and will
+thus trigger at the earliest possible time in the future.
 
 If the input `$promise` is already settled, then the resulting promise will
 resolve or reject immediately without starting a timer at all.
@@ -118,151 +118,38 @@ React\Promise\Timer\timeout($promise, 10.0)
 ;
 ```
 
-#### Timeout cancellation
+As discussed above, the [`timeout()`](#timeout) function will take care of
+the underlying operation if it takes *too long*. In this case, you can be
+sure the resulting promise will always be rejected with a
+[`TimeoutException`](#timeoutexception). On top of this, the function will
+try to *cancel* the underlying operation. Responsibility for this
+cancellation logic is left up to the underlying operation.
 
-As discussed above, the [`timeout()`](#timeout) function will *cancel* the
-underlying operation if it takes *too long*.
-This means that you can be sure the resulting promise will then be rejected
-with a [`TimeoutException`](#timeoutexception).
+- A common use case involves cleaning up any resources like open network
+  sockets or file handles or terminating external processes or timers.
 
-However, what happens to the underlying input `$promise` is a bit more tricky:
-Once the timer fires, we will try to call
-[`$promise->cancel()`](https://github.com/reactphp/promise#cancellablepromiseinterfacecancel)
-on the input `$promise` which in turn invokes its [cancellation handler](#cancellation-handler).
+- If the given input `$promise` does not support cancellation, then this is a
+  NO-OP. This means that while the resulting promise will still be rejected,
+  the underlying input `$promise` may still be pending and can hence continue
+  consuming resources
 
-This means that it's actually up the input `$promise` to handle
-[cancellation support](https://github.com/reactphp/promise#cancellablepromiseinterface).
-
-* A common use case involves cleaning up any resources like open network sockets or
-  file handles or terminating external processes or timers.
-
-* If the given input `$promise` does not support cancellation, then this is a NO-OP.
-  This means that while the resulting promise will still be rejected, the underlying
-  input `$promise` may still be pending and can hence continue consuming resources.
-
-See the following chapter for more details on the cancellation handler.
-
-#### Cancellation handler
-
-For example, an implementation for the above operation could look like this:
+On top of this, the returned promise is implemented in such a way that it can
+be cancelled when it is still pending. Cancelling a pending promise will
+cancel the underlying operation. As discussed above, responsibility for this
+cancellation logic is left up to the underlying operation.
 
 ```php
-function accessSomeRemoteResource()
-{
-    return new Promise(
-        function ($resolve, $reject) use (&$socket) {
-            // this will be called once the promise is created
-            // a common use case involves opening any resources and eventually resolving
-            $socket = createSocket();
-            $socket->on('data', function ($data) use ($resolve) {
-                $resolve($data);
-            });
-        },
-        function ($resolve, $reject) use (&$socket) {
-            // this will be called once calling `cancel()` on this promise
-            // a common use case involves cleaning any resources and then rejecting
-            $socket->close();
-            $reject(new \RuntimeException('Operation cancelled'));
-        }
-    );
-}
+$promise = accessSomeRemoteResource();
+$timeout = React\Promise\Timer\timeout($promise, 10.0);
+
+$timeout->cancel();
 ```
-
-In this example, calling `$promise->cancel()` will invoke the registered cancellation
-handler which then closes the network socket and rejects the `Promise` instance.
-
-If no cancellation handler is passed to the `Promise` constructor, then invoking
-its `cancel()` method it is effectively a NO-OP.
-This means that it may still be pending and can hence continue consuming resources.
 
 For more details on the promise cancellation, please refer to the
 [Promise documentation](https://github.com/reactphp/promise#cancellablepromiseinterface).
 
-#### Input cancellation
-
-Irrespective of the timeout handling, you can also explicitly `cancel()` the
-input `$promise` at any time.
-This means that the `timeout()` handling does not affect cancellation of the
-input `$promise`, as demonstrated in the following example:
-
-```php
-$promise = accessSomeRemoteResource();
-$timeout = React\Promise\Timer\timeout($promise, 10.0);
-
-$promise->cancel();
-```
-
-The registered [cancellation handler](#cancellation-handler) is responsible for
-handling the `cancel()` call:
-
-* A described above, a common use involves resource cleanup and will then *reject*
-  the `Promise`.
-  If the input `$promise` is being rejected, then the timeout will be aborted
-  and the resulting promise will also be rejected.
-* If the input `$promise` is still pending, then the timout will continue
-  running until the timer expires.
-  The same happens if the input `$promise` does not register a
-  [cancellation handler](#cancellation-handler). 
-
-#### Output cancellation
-
-Similarily, you can also explicitly `cancel()` the resulting promise like this:
-
-```php
-$promise = accessSomeRemoteResource();
-$timeout = React\Promise\Timer\timeout($promise, 10.0);
-
-$timeout->cancel();
-```
-
-Note how this looks very similar to the above [input cancellation](#input-cancellation)
-example. Accordingly, it also behaves very similar.
-
-Calling `cancel()` on the resulting promise will merely try
-to `cancel()` the input `$promise`.
-This means that we do not take over responsibility of the outcome and it's
-entirely up to the input `$promise` to handle cancellation support.
-
-The registered [cancellation handler](#cancellation-handler) is responsible for
-handling the `cancel()` call:
-
-* As described above, a common use involves resource cleanup and will then *reject*
-  the `Promise`.
-  If the input `$promise` is being rejected, then the timeout will be aborted
-  and the resulting promise will also be rejected.
-* If the input `$promise` is still pending, then the timout will continue
-  running until the timer expires.
-  The same happens if the input `$promise` does not register a
-  [cancellation handler](#cancellation-handler). 
-
-To re-iterate, note that calling `cancel()` on the resulting promise will merely
-try to cancel the input `$promise` only.
-It is then up to the cancellation handler of the input promise to settle the promise.
-If the input promise is still pending when the timeout occurs, then the normal
-[timeout cancellation](#timeout-cancellation) handling will trigger, effectively rejecting
-the output promise with a [`TimeoutException`](#timeoutexception).
-
-This is done for consistency with the [timeout cancellation](#timeout-cancellation)
-handling and also because it is assumed this is often used like this:
-
-```php
-$timeout = React\Promise\Timer\timeout(accessSomeRemoteResource(), 10.0);
-
-$timeout->cancel();
-```
-
-As described above, this example works as expected and cleans up any resources
-allocated for the input `$promise`.
-
-Note that if the given input `$promise` does not support cancellation, then this
-is a NO-OP.
-This means that while the resulting promise will still be rejected after the
-timeout, the underlying input `$promise` may still be pending and can hence
-continue consuming resources.
-
-#### Collections
-
-If you want to wait for multiple promises to resolve, you can use the normal promise primitives like this:
+If you want to wait for multiple promises to resolve, you can use the normal
+promise primitives like this:
 
 ```php
 $promises = array(
@@ -271,14 +158,15 @@ $promises = array(
     accessSomeRemoteResource()
 );
 
-$promise = \React\Promise\all($promises);
+$promise = React\Promise\all($promises);
 
 React\Promise\Timer\timeout($promise, 10)->then(function ($values) {
     // *all* promises resolved
 });
 ```
 
-The applies to all promise collection primitives alike, i.e. `all()`, `race()`, `any()`, `some()` etc.
+The applies to all promise collection primitives alike, i.e. `all()`,
+`race()`, `any()`, `some()` etc.
 
 For more details on the promise primitives, please refer to the
 [Promise documentation](https://github.com/reactphp/promise#functions).
@@ -286,7 +174,7 @@ For more details on the promise primitives, please refer to the
 ### resolve()
 
 The `resolve(float $time, ?LoopInterface $loop = null): PromiseInterface<float, RuntimeException>` function can be used to
-create a new Promise that resolves in `$time` seconds with the `$time` as the fulfillment value.
+create a new promise that resolves in `$time` seconds with the `$time` as the fulfillment value.
 
 ```php
 React\Promise\Timer\resolve(1.5)->then(function ($time) {
@@ -295,9 +183,9 @@ React\Promise\Timer\resolve(1.5)->then(function ($time) {
 ```
 
 Internally, the given `$time` value will be used to start a timer that will
-resolve the promise once it triggers.
-This implies that if you pass a really small (or negative) value, it will still
-start a timer and will thus trigger at the earliest possible time in the future.
+resolve the promise once it triggers. This implies that if you pass a really
+small (or negative) value, it will still start a timer and will thus trigger
+at the earliest possible time in the future.
 
 This function takes an optional `LoopInterface|null $loop` parameter that can be used to
 pass the event loop instance to use. You can use a `null` value here in order to
@@ -305,9 +193,9 @@ use the [default loop](https://github.com/reactphp/event-loop#loop). This value
 SHOULD NOT be given unless you're sure you want to explicitly use a given event
 loop instance.
 
-#### Resolve cancellation
-
-You can explicitly `cancel()` the resulting timer promise at any time:
+The returned promise is implemented in such a way that it can be cancelled
+when it is still pending. Cancelling a pending promise will reject its value
+with a `RuntimeException` and clean up any pending timers.
 
 ```php
 $timer = React\Promise\Timer\resolve(2.0);
@@ -315,12 +203,10 @@ $timer = React\Promise\Timer\resolve(2.0);
 $timer->cancel();
 ```
 
-This will abort the timer and *reject* with a `RuntimeException`.
-
 ### reject()
 
 The `reject(float $time, ?LoopInterface $loop = null): PromiseInterface<void, TimeoutException|RuntimeException>` function can be used to
-create a new Promise which rejects in `$time` seconds with a `TimeoutException`.
+create a new promise which rejects in `$time` seconds with a `TimeoutException`.
 
 ```php
 React\Promise\Timer\reject(2.0)->then(null, function (React\Promise\Timer\TimeoutException $e) {
@@ -329,9 +215,9 @@ React\Promise\Timer\reject(2.0)->then(null, function (React\Promise\Timer\Timeou
 ```
 
 Internally, the given `$time` value will be used to start a timer that will
-reject the promise once it triggers.
-This implies that if you pass a really small (or negative) value, it will still
-start a timer and will thus trigger at the earliest possible time in the future.
+reject the promise once it triggers. This implies that if you pass a really
+small (or negative) value, it will still start a timer and will thus trigger
+at the earliest possible time in the future.
 
 This function takes an optional `LoopInterface|null $loop` parameter that can be used to
 pass the event loop instance to use. You can use a `null` value here in order to
@@ -339,20 +225,15 @@ use the [default loop](https://github.com/reactphp/event-loop#loop). This value
 SHOULD NOT be given unless you're sure you want to explicitly use a given event
 loop instance.
 
-This function complements the [`resolve()`](#resolve) function
-and can be used as a basic building block for higher-level promise consumers.
-
-#### Reject cancellation
-
-You can explicitly `cancel()` the resulting timer promise at any time:
+The returned promise is implemented in such a way that it can be cancelled
+when it is still pending. Cancelling a pending promise will reject its value
+with a `RuntimeException` and clean up any pending timers.
 
 ```php
 $timer = React\Promise\Timer\reject(2.0);
 
 $timer->cancel();
 ```
-
-This will abort the timer and *reject* with a `RuntimeException`.
 
 ### TimeoutException
 
