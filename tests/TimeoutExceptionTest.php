@@ -2,47 +2,45 @@
 
 namespace React\Tests\Promise\Timer;
 
-use ErrorException;
 use React\Promise\Timer\TimeoutException;
 
 class TimeoutExceptionTest extends TestCase
 {
-    public function testAccessTimeout()
+    public function testCtorWithAllParameters()
     {
-        $e = new TimeoutException(10);
+        $previous = new \Exception();
+        $e = new TimeoutException(1.0, 'Error', 42, $previous);
 
-        $this->assertEquals(10, $e->getTimeout());
+        $this->assertEquals(1.0, $e->getTimeout());
+        $this->assertEquals('Error', $e->getMessage());
+        $this->assertEquals(42, $e->getCode());
+        $this->assertSame($previous, $e->getPrevious());
     }
 
-    public function testEnsureNoDeprecationsAreTriggered()
+    public function testCtorWithDefaultValues()
     {
-        $formerReporting = error_reporting();
-        error_reporting(E_ALL | E_STRICT);
-        $this->setStrictErrorHandling();
+        $e = new TimeoutException(2.0);
 
-        try {
-            $e = new TimeoutException(10);
-        } catch (ErrorException $e) {
-            error_reporting($formerReporting);
-            throw $e;
-        }
-
-        error_reporting($formerReporting);
-        $this->assertEquals(10, $e->getTimeout());
+        $this->assertEquals(2.0, $e->getTimeout());
+        $this->assertEquals('', $e->getMessage());
+        $this->assertEquals(0, $e->getCode());
+        $this->assertNull($e->getPrevious());
     }
 
-    protected function setStrictErrorHandling()
+    public function testCtorWithIntTimeoutWillBeReturnedAsFloat()
     {
-        set_error_handler(function ($errno, $errstr, $errfile, $errline) {
-            if (! (error_reporting() & $errno)) {
-                return false;
-            }
-            switch ($errno) {
-                case E_DEPRECATED:
-                    throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
-            }
+        $e = new TimeoutException(1);
 
-            return false;
-        });
+        $this->assertSame(1.0, $e->getTimeout());
+    }
+
+    public function testLegacyCtorWithNullValues()
+    {
+        $e = new TimeoutException(10, null, null, null);
+
+        $this->assertEquals(10.0, $e->getTimeout());
+        $this->assertEquals('', $e->getMessage());
+        $this->assertEquals(0, $e->getCode());
+        $this->assertNull($e->getPrevious());
     }
 }
