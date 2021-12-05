@@ -249,7 +249,7 @@ function sleep($time, LoopInterface $loop = null)
 }
 
 /**
- * Create a new promise that resolves in `$time` seconds with the `$time` as the fulfillment value.
+ * [Deprecated] Create a new promise that resolves in `$time` seconds with the `$time` as the fulfillment value.
  *
  * ```php
  * React\Promise\Timer\resolve(1.5)->then(function ($time) {
@@ -281,6 +281,8 @@ function sleep($time, LoopInterface $loop = null)
  * @param float $time
  * @param ?LoopInterface $loop
  * @return PromiseInterface<float, \RuntimeException>
+ * @deprecated 1.8.0 See `sleep()` instead
+ * @see sleep()
  */
 function resolve($time, LoopInterface $loop = null)
 {
@@ -290,7 +292,7 @@ function resolve($time, LoopInterface $loop = null)
 }
 
 /**
- * Create a new promise which rejects in `$time` seconds with a `TimeoutException`.
+ * [Deprecated] Create a new promise which rejects in `$time` seconds with a `TimeoutException`.
  *
  * ```php
  * React\Promise\Timer\reject(2.0)->then(null, function (React\Promise\Timer\TimeoutException $e) {
@@ -322,6 +324,8 @@ function resolve($time, LoopInterface $loop = null)
  * @param float         $time
  * @param LoopInterface $loop
  * @return PromiseInterface<void, TimeoutException|\RuntimeException>
+ * @deprecated 1.8.0 See `sleep()` instead
+ * @see sleep()
  */
 function reject($time, LoopInterface $loop = null)
 {

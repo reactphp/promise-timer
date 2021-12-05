@@ -9,8 +9,8 @@ A trivial implementation of timeouts for `Promise`s, built on top of [ReactPHP](
 * [Usage](#usage)
     * [timeout()](#timeout)
     * [sleep()](#sleep)
-    * [resolve()](#resolve)
-    * [reject()](#reject)
+    * [~~resolve()~~](#resolve)
+    * [~~reject()~~](#reject)
     * [TimeoutException](#timeoutexception)
         * [getTimeout()](#gettimeout)
 * [Install](#install)
@@ -204,7 +204,9 @@ $timer = React\Promise\Timer\sleep(2.0);
 $timer->cancel();
 ```
 
-### resolve()
+### ~~resolve()~~
+
+> Deprecated since v1.8.0, see [`sleep()`](#sleep) instead.
 
 The `resolve(float $time, ?LoopInterface $loop = null): PromiseInterface<float, RuntimeException>` function can be used to
 create a new promise that resolves in `$time` seconds with the `$time` as the fulfillment value.
@@ -236,7 +238,9 @@ $timer = React\Promise\Timer\resolve(2.0);
 $timer->cancel();
 ```
 
-### reject()
+### ~~reject()~~
+
+> Deprecated since v1.8.0, see [`sleep()`](#sleep) instead.
 
 The `reject(float $time, ?LoopInterface $loop = null): PromiseInterface<void, TimeoutException|RuntimeException>` function can be used to
 create a new promise which rejects in `$time` seconds with a `TimeoutException`.
