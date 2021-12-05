@@ -8,8 +8,9 @@ A trivial implementation of timeouts for `Promise`s, built on top of [ReactPHP](
 
 * [Usage](#usage)
     * [timeout()](#timeout)
-    * [resolve()](#resolve)
-    * [reject()](#reject)
+    * [sleep()](#sleep)
+    * [~~resolve()~~](#resolve)
+    * [~~reject()~~](#reject)
     * [TimeoutException](#timeoutexception)
         * [getTimeout()](#gettimeout)
 * [Install](#install)
@@ -171,7 +172,41 @@ The applies to all promise collection primitives alike, i.e. `all()`,
 For more details on the promise primitives, please refer to the
 [Promise documentation](https://github.com/reactphp/promise#functions).
 
-### resolve()
+### sleep()
+
+The `sleep(float $time, ?LoopInterface $loop = null): PromiseInterface<void, RuntimeException>` function can be used to
+create a new promise that resolves in `$time` seconds.
+
+```php
+React\Promise\Timer\sleep(1.5)->then(function () {
+    echo 'Thanks for waiting!' . PHP_EOL;
+});
+```
+
+Internally, the given `$time` value will be used to start a timer that will
+resolve the promise once it triggers. This implies that if you pass a really
+small (or negative) value, it will still start a timer and will thus trigger
+at the earliest possible time in the future.
+
+This function takes an optional `LoopInterface|null $loop` parameter that can be used to
+pass the event loop instance to use. You can use a `null` value here in order to
+use the [default loop](https://github.com/reactphp/event-loop#loop). This value
+SHOULD NOT be given unless you're sure you want to explicitly use a given event
+loop instance.
+
+The returned promise is implemented in such a way that it can be cancelled
+when it is still pending. Cancelling a pending promise will reject its value
+with a `RuntimeException` and clean up any pending timers.
+
+```php
+$timer = React\Promise\Timer\sleep(2.0);
+
+$timer->cancel();
+```
+
+### ~~resolve()~~
+
+> Deprecated since v1.8.0, see [`sleep()`](#sleep) instead.
 
 The `resolve(float $time, ?LoopInterface $loop = null): PromiseInterface<float, RuntimeException>` function can be used to
 create a new promise that resolves in `$time` seconds with the `$time` as the fulfillment value.
@@ -203,7 +238,9 @@ $timer = React\Promise\Timer\resolve(2.0);
 $timer->cancel();
 ```
 
-### reject()
+### ~~reject()~~
+
+> Deprecated since v1.8.0, see [`sleep()`](#sleep) instead.
 
 The `reject(float $time, ?LoopInterface $loop = null): PromiseInterface<void, TimeoutException|RuntimeException>` function can be used to
 create a new promise which rejects in `$time` seconds with a `TimeoutException`.

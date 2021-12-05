@@ -193,7 +193,63 @@ function timeout(PromiseInterface $promise, $time, LoopInterface $loop = null)
 }
 
 /**
- * Create a new promise that resolves in `$time` seconds with the `$time` as the fulfillment value.
+ * Create a new promise that resolves in `$time` seconds.
+ *
+ * ```php
+ * React\Promise\Timer\sleep(1.5)->then(function () {
+ *     echo 'Thanks for waiting!' . PHP_EOL;
+ * });
+ * ```
+ *
+ * Internally, the given `$time` value will be used to start a timer that will
+ * resolve the promise once it triggers. This implies that if you pass a really
+ * small (or negative) value, it will still start a timer and will thus trigger
+ * at the earliest possible time in the future.
+ *
+ * This function takes an optional `LoopInterface|null $loop` parameter that can be used to
+ * pass the event loop instance to use. You can use a `null` value here in order to
+ * use the [default loop](https://github.com/reactphp/event-loop#loop). This value
+ * SHOULD NOT be given unless you're sure you want to explicitly use a given event
+ * loop instance.
+ *
+ * The returned promise is implemented in such a way that it can be cancelled
+ * when it is still pending. Cancelling a pending promise will reject its value
+ * with a `RuntimeException` and clean up any pending timers.
+ *
+ * ```php
+ * $timer = React\Promise\Timer\sleep(2.0);
+ *
+ * $timer->cancel();
+ * ```
+ *
+ * @param float $time
+ * @param ?LoopInterface $loop
+ * @return PromiseInterface<void, \RuntimeException>
+ */
+function sleep($time, LoopInterface $loop = null)
+{
+    if ($loop === null) {
+        $loop = Loop::get();
+    }
+
+    $timer = null;
+    return new Promise(function ($resolve) use ($loop, $time, &$timer) {
+        // resolve the promise when the timer fires in $time seconds
+        $timer = $loop->addTimer($time, function () use ($resolve) {
+            $resolve();
+        });
+    }, function () use (&$timer, $loop) {
+        // cancelling this promise will cancel the timer, clean the reference
+        // in order to avoid garbage references in call stack and then reject.
+        $loop->cancelTimer($timer);
+        $timer = null;
+
+        throw new \RuntimeException('Timer cancelled');
+    });
+}
+
+/**
+ * [Deprecated] Create a new promise that resolves in `$time` seconds with the `$time` as the fulfillment value.
  *
  * ```php
  * React\Promise\Timer\resolve(1.5)->then(function ($time) {
@@ -225,31 +281,18 @@ function timeout(PromiseInterface $promise, $time, LoopInterface $loop = null)
  * @param float $time
  * @param ?LoopInterface $loop
  * @return PromiseInterface<float, \RuntimeException>
+ * @deprecated 1.8.0 See `sleep()` instead
+ * @see sleep()
  */
 function resolve($time, LoopInterface $loop = null)
 {
-    if ($loop === null) {
-        $loop = Loop::get();
-    }
-
-    $timer = null;
-    return new Promise(function ($resolve) use ($loop, $time, &$timer) {
-        // resolve the promise when the timer fires in $time seconds
-        $timer = $loop->addTimer($time, function () use ($time, $resolve) {
-            $resolve($time);
-        });
-    }, function () use (&$timer, $loop) {
-        // cancelling this promise will cancel the timer, clean the reference
-        // in order to avoid garbage references in call stack and then reject.
-        $loop->cancelTimer($timer);
-        $timer = null;
-
-        throw new \RuntimeException('Timer cancelled');
+    return sleep($time, $loop)->then(function() use ($time) {
+        return $time;
     });
 }
 
 /**
- * Create a new promise which rejects in `$time` seconds with a `TimeoutException`.
+ * [Deprecated] Create a new promise which rejects in `$time` seconds with a `TimeoutException`.
  *
  * ```php
  * React\Promise\Timer\reject(2.0)->then(null, function (React\Promise\Timer\TimeoutException $e) {
@@ -281,10 +324,12 @@ function resolve($time, LoopInterface $loop = null)
  * @param float         $time
  * @param LoopInterface $loop
  * @return PromiseInterface<void, TimeoutException|\RuntimeException>
+ * @deprecated 1.8.0 See `sleep()` instead
+ * @see sleep()
  */
 function reject($time, LoopInterface $loop = null)
 {
-    return resolve($time, $loop)->then(function ($time) {
+    return sleep($time, $loop)->then(function () use ($time) {
         throw new TimeoutException($time, 'Timer expired after ' . $time . ' seconds');
     });
 }
