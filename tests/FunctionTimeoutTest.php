@@ -10,7 +10,7 @@ class FunctionTimeoutTest extends TestCase
 {
     public function testResolvedWillResolveRightAway()
     {
-        $promise = Promise\resolve();
+        $promise = Promise\resolve(null);
 
         $promise = Timer\timeout($promise, 3);
 
@@ -19,7 +19,7 @@ class FunctionTimeoutTest extends TestCase
 
     public function testResolvedExpiredWillResolveRightAway()
     {
-        $promise = Promise\resolve();
+        $promise = Promise\resolve(null);
 
         $promise = Timer\timeout($promise, -1);
 
@@ -28,7 +28,7 @@ class FunctionTimeoutTest extends TestCase
 
     public function testResolvedWillNotStartTimer()
     {
-        $promise = Promise\resolve();
+        $promise = Promise\resolve(null);
 
         Timer\timeout($promise, 3);
 
@@ -139,7 +139,9 @@ class FunctionTimeoutTest extends TestCase
 
     public function testCancelGivenPromiseWillReject()
     {
-        $promise = new \React\Promise\Promise(function () { }, function ($resolve, $reject) { $reject(); });
+        $promise = new \React\Promise\Promise(function () { }, function () {
+            throw new \RuntimeException();
+        });
 
         $timeout = Timer\timeout($promise, 0.01);
 
@@ -151,7 +153,9 @@ class FunctionTimeoutTest extends TestCase
 
     public function testCancelTimeoutWillRejectIfGivenPromiseWillReject()
     {
-        $promise = new \React\Promise\Promise(function () { }, function ($resolve, $reject) { $reject(); });
+        $promise = new \React\Promise\Promise(function () { }, function () {
+            throw new \RuntimeException();
+        });
 
         $timeout = Timer\timeout($promise, 0.01);
 
@@ -163,7 +167,9 @@ class FunctionTimeoutTest extends TestCase
 
     public function testCancelTimeoutWillResolveIfGivenPromiseWillResolve()
     {
-        $promise = new \React\Promise\Promise(function () { }, function ($resolve, $reject) { $resolve(); });
+        $promise = new \React\Promise\Promise(function () { }, function ($resolve) {
+            $resolve(null);
+        });
 
         $timeout = Timer\timeout($promise, 0.01);
 

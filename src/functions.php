@@ -236,7 +236,7 @@ function sleep($time, LoopInterface $loop = null)
     return new Promise(function ($resolve) use ($loop, $time, &$timer) {
         // resolve the promise when the timer fires in $time seconds
         $timer = $loop->addTimer($time, function () use ($resolve) {
-            $resolve();
+            $resolve(null);
         });
     }, function () use (&$timer, $loop) {
         // cancelling this promise will cancel the timer, clean the reference
