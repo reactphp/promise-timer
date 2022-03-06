@@ -64,6 +64,7 @@ class FunctionTimeoutTest extends TestCase
     public function testPendingWillRejectOnTimeout()
     {
         $promise = $this->getMockBuilder('React\Promise\PromiseInterface')->getMock();
+        $promise->expects($this->once())->method('then')->willReturn($this->getMockBuilder('React\Promise\PromiseInterface')->getMock());
 
         $promise = Timer\timeout($promise, 0.01);
 
