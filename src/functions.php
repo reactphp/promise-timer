@@ -64,20 +64,16 @@ use React\Promise\PromiseInterface;
  * );
  * ```
  *
- * Or if you're using [react/promise v2.2.0](https://github.com/reactphp/promise) or up:
+ * Or if you're using [react/promise v3](https://github.com/reactphp/promise):
  *
  * ```php
- * React\Promise\Timer\timeout($promise, 10.0)
- *     ->then(function ($value) {
- *         // the operation finished within 10.0 seconds
- *     })
- *     ->otherwise(function (React\Promise\Timer\TimeoutException $error) {
- *         // the operation has failed due to a timeout
- *     })
- *     ->otherwise(function ($error) {
- *         // the input operation has failed due to some other error
- *     })
- * ;
+ * React\Promise\Timer\timeout($promise, 10.0)->then(function ($value) {
+ *     // the operation finished within 10.0 seconds
+ * })->catch(function (React\Promise\Timer\TimeoutException $error) {
+ *     // the operation has failed due to a timeout
+ * })->catch(function (Throwable $error) {
+ *     // the input operation has failed due to some other error
+ * });
  * ```
  *
  * As discussed above, the [`timeout()`](#timeout) function will take care of
@@ -133,10 +129,10 @@ use React\Promise\PromiseInterface;
  * For more details on the promise primitives, please refer to the
  * [Promise documentation](https://github.com/reactphp/promise#functions).
  *
- * @param PromiseInterface<mixed, \Exception|mixed> $promise
+ * @param PromiseInterface<mixed, \Throwable|mixed> $promise
  * @param float $time
  * @param ?LoopInterface $loop
- * @return PromiseInterface<mixed, TimeoutException|\Exception|mixed>
+ * @return PromiseInterface<mixed, TimeoutException|\Throwable|mixed>
  */
 function timeout(PromiseInterface $promise, $time, LoopInterface $loop = null)
 {
