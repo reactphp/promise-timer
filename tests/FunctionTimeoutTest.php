@@ -52,7 +52,9 @@ class FunctionTimeoutTest extends TestCase
     {
         $promise = Promise\reject(new \Exception('reject'));
 
-        Timer\timeout($promise, 3);
+        $promise = Timer\timeout($promise, 3);
+
+        $promise->then(null, $this->expectCallableOnce()); // avoid reporting unhandled rejection
 
         $time = microtime(true);
         Loop::run();
@@ -83,7 +85,9 @@ class FunctionTimeoutTest extends TestCase
         $promise = $this->getMockBuilder($cancellableInterface)->getMock();
         $promise->expects($this->once())->method('then')->willReturn($cancellable);
 
-        Timer\timeout($promise, 0.01);
+        $promise = Timer\timeout($promise, 0.01);
+
+        $promise->then(null, $this->expectCallableOnce()); // avoid reporting unhandled rejection
 
         Loop::run();
     }
@@ -210,6 +214,8 @@ class FunctionTimeoutTest extends TestCase
 
         $promise = Timer\timeout($promise, 1.0);
 
+        $promise->then(null, $this->expectCallableOnce()); // avoid reporting unhandled rejection
+
         Loop::run();
         unset($promise);
 
@@ -230,6 +236,8 @@ class FunctionTimeoutTest extends TestCase
 
         $promise = Timer\timeout($promise, 0.01);
 
+        $promise->then(null, $this->expectCallableOnce()); // avoid reporting unhandled rejection
+
         Loop::run();
         unset($promise);
 
@@ -247,6 +255,8 @@ class FunctionTimeoutTest extends TestCase
         $promise = new \React\Promise\Promise(function () { });
 
         $promise = Timer\timeout($promise, 0.01);
+
+        $promise->then(null, $this->expectCallableOnce()); // avoid reporting unhandled rejection
 
         Loop::run();
         unset($promise);
@@ -267,6 +277,8 @@ class FunctionTimeoutTest extends TestCase
         });
 
         $promise = Timer\timeout($promise, 0.01);
+
+        $promise->then(null, $this->expectCallableOnce()); // avoid reporting unhandled rejection
 
         Loop::run();
         unset($promise);

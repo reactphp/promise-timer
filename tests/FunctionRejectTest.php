@@ -58,6 +58,11 @@ class FunctionRejectTest extends TestCase
         gc_collect_cycles(); // clear twice to avoid leftovers in PHP 7.4 with ext-xdebug and code coverage turned on
 
         $promise = Timer\reject(0.01);
+
+        $promise->then(null, $this->expectCallableOnce()); // avoid reporting unhandled rejection
+
+        Loop::run();
+
         unset($promise);
 
         $this->assertEquals(0, gc_collect_cycles());
