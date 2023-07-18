@@ -129,10 +129,11 @@ use React\Promise\PromiseInterface;
  * For more details on the promise primitives, please refer to the
  * [Promise documentation](https://github.com/reactphp/promise#functions).
  *
- * @param PromiseInterface<mixed> $promise
+ * @template T
+ * @param PromiseInterface<T> $promise
  * @param float $time
  * @param ?LoopInterface $loop
- * @return PromiseInterface<mixed>
+ * @return PromiseInterface<T>
  */
 function timeout(PromiseInterface $promise, $time, LoopInterface $loop = null)
 {
@@ -318,7 +319,7 @@ function resolve($time, LoopInterface $loop = null)
  *
  * @param float         $time
  * @param LoopInterface $loop
- * @return PromiseInterface<void>
+ * @return PromiseInterface<never>
  * @deprecated 1.8.0 See `sleep()` instead
  * @see sleep()
  */
