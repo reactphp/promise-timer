@@ -47,7 +47,7 @@ Timer\timeout(…);
 
 ### timeout()
 
-The `timeout(PromiseInterface<mixed> $promise, float $time, ?LoopInterface $loop = null): PromiseInterface<mixed>` function can be used to
+The `timeout(PromiseInterface<T> $promise, float $time, ?LoopInterface $loop = null): PromiseInterface<T>` function can be used to
 cancel operations that take *too long*.
 
 You need to pass in an input `$promise` that represents a pending operation
@@ -239,7 +239,7 @@ $timer->cancel();
 
 > Deprecated since v1.8.0, see [`sleep()`](#sleep) instead.
 
-The `reject(float $time, ?LoopInterface $loop = null): PromiseInterface<void>` function can be used to
+The `reject(float $time, ?LoopInterface $loop = null): PromiseInterface<never>` function can be used to
 create a new promise which rejects in `$time` seconds with a `TimeoutException`.
 
 ```php
